@@ -1,0 +1,432 @@
+\documentclass[11pt]{article}
+\usepackage{amsthm,amssymb,graphicx,graphicx,multirow,amsmath,cite}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{epstopdf}
+\usepackage{etoolbox}
+\include{notation}
+\oddsidemargin=0.15in
+\evensidemargin=0.15in
+\topmargin=-.5in
+\textheight=9in
+\textwidth=6.25in
+%\bootrue{Advanced}
+
+\newtheorem{lemma}{Lemma}{}
+  \newtheorem{thm}{Theorem}
+  \newtheorem{theorem}{Theorem}
+  \newtheorem{prop}{Proposition}
+  \newtheorem{cor}[thm]{Corollary}
+  \newtheorem{defi}[thm]{Definition}
+  \newtheorem{definition}[thm]{Definition}
+  
+  %% USE THESE IN YOUR TEX CODE.
+\def\E{\mathbb{E}} % For Expectation
+\def\P{\mathbb{P}} % for probabiltiy
+\def\EE{\mathbb{E}^{!o}} % For Palm expectation
+\def\ie{{\em i.e.}} 
+\def\eg{{\em e.g.}}
+\def\V{\operatorname{Var}}
+\def\L{\mathcal{L}} % For Laplace transform
+\def\i{\mathbf{1}} % Indicator random variable
+\def\l{\ell}% For path loss moel
+
+\begin{document}
+\input{preamble.tex}
+\labreport{1}{09/14/2015}{Experiments with Sampling in $B^n(r)$ }{Prasanth Prahladan}{100817764}
+
+\section{Algo 1: Sampling the Unit Ball}
+
+\textbf{Q2. Plot the number of points rejected in $Algo 1$ as function of n}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q1.eps}\\
+\caption{Plot of number of points rejected in Algo $1$ as a function of spatial dimension}
+\label{fig:que2}
+\end{figure}
+
+
+It is observed that as the dimensions increases, the number of points rejected increases exponentially. It becomes extremely difficult to obtain a point inside the Unit-Circle by the method of Rejection-Sampling. 
+
+By the method of construction, all the points lie within the Cube of length 2 units. However, we know that the volume of the unit-ball in n-dimensions varies according to the law:
+\begin{align*}
+V(B^n(1)) &= \frac{\pi^{n/2}}{\Gamma(1+n/2)}\\
+\lim_{n \rightarrow \infty}V(B^n(1)) = 0.
+\end{align*}
+Thus, the volume of the unit-ball decreases with an increase in dimension of the space. The probability of randomly sampling a point inside the unit ball decreases in proportion to the ratio of the volumes of the Unit-Ball to the Cube of side 2-units, i.e.
+\begin{align*}
+\text{Prob(sample inside Unit Ball)} &= \frac{V(B^n(1))}{V(\text{cube})} = \big(\frac{1}{2}\big)^n \frac{\pi^{n/2}}{\Gamma(1+n/2)}
+\end{align*}
+
+\hrulefill
+
+\section{Sampling the Unit Sphere}
+
+\subsection{Experiments}
+
+\textbf{Q3. Generate 10000 samples in $\mathcal{R}^n$ from a Gaussian distribution($\mu=0$,$\sigma=1$)}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q3_hist.eps}\\
+\caption{Q4. Plot of histogram of $||x||$ of points Gaussian(0,1) Distributed points in $\mathcal{R}^n$ with n={4,25,100,225,400}}
+\label{fig:que4_hist}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q3_meanVar.eps}\\
+\caption{Plot of Mean and Variance of above distributions as a function of spatial dimension}
+\label{fig:que5_meanVar}
+\end{figure}
+
+\textbf{Q5. Conjecture on $||x||$, when x is Gaussian distributed in $\mathcal{R}^n$}
+What do you notice? Make a conjecture on the concentration of norm(x), when x is gaussian distributed in Rn.
+
+We notice that the n-dimensional points obtained by sampling Gaussian Distribution$(\mu = 0, \sigma^2 = 1)$ are concentrated about a spherical shell of radius,$r = \sqrt(n)$. This behaviour is noted in the pattern of the horizontal parabolic curve of the variations of mean of the distribution with spatial dimension in Figure(\ref{fig:que5_meanVar}). Note the variance of the norms about the means is approximately constant at $0.5$, suggesting that the Gaussian distribution is preserved.
+
+
+
+\hrulefill
+
+\subsection{Concentration of the Gaussian Measure}
+
+Let $\gamma$ be the Gaussian Measure. For any measurable set $A\subset \mathcal{R}^n$, $\gamma$ is defined by the integral over A,
+\begin{align}
+\gamma(A) = (2\pi)^{-n/2}\int_{A} e^{-||x||^2 /2}dx \label{eq:GaussianMeasure}
+\end{align}
+Note that the integral is really computed using the density:
+\begin{align}
+d\gamma(x) = d\gamma(x_1, x_2, \cdots x_n) = (2\pi)^{-n/2} e^{\frac{1}{2} \sum_{t=1}^n x_t^2} dx_1 dx_2 \cdots dx_n
+\end{align}
+Let $f(x)$ be a function defined on $\mathcal{R}^n$ taking values in $\mathcal{R}$, i.e. $f(x): \mathcal{R}^n \rightarrow \mathcal{R}$.
+
+
+\textbf{Q6. }
+Define the set $Q = \{x\in \mathcal{R}^n : f(x) \leq a, a\in \mathcal{R} \}$. We are required to prove: 
+\begin{align}
+\gamma\{Q \} \leq e^{a \lambda}\int_{\mathcal{R}^n} e^{-\lambda f(x)} d\gamma(x)\label{eq:MainInequality}
+\end{align}
+We know that $\forall x \in Q$,
+\begin{align*}
+f(x) &\leq a \implies e^{-\lambda f(x)} \geq  e^{-\lambda a}
+\end{align*}
+Therefore, we have
+\begin{align*}
+\int_{Q}e^{-\lambda f(x)} d\gamma(x) &\geq \int_{Q}e^{-\lambda a} d\gamma(x)\\
+&\geq e^{-a \lambda }\int_{Q} d\gamma(x)\\
+&\geq e^{-a \lambda }\gamma(Q).
+\end{align*}
+
+Further, note that for $ Q^c =\{x\in \mathcal{R}^n : f(x) > a \} $
+\begin{align*}
+\int_{\mathcal{R}^n}e^{-\lambda f(x)} d\gamma(x) &= \int_{Q}e^{-\lambda f(x)} d\gamma(x) + \int_{Q^c}e^{-\lambda f(x)} d\gamma(x) 
+\end{align*}
+For the following result to hold true, 
+\begin{align}
+\int_{\mathcal{R}^n}e^{-\lambda f(x)} d\gamma(x) \geq \int_{Q}e^{-\lambda f(x)} d\gamma(x) \geq e^{-a \lambda }\gamma(Q) \label{eq:Six}
+\end{align}
+we require that 
+\begin{align*}
+\int_{Q^c}e^{-\lambda f(x)} d\gamma(x) \geq 0
+\end{align*}
+Similar to the steps followed above, we find that
+\begin{align*}
+f(x) > a \implies -\lambda f(x) < -a\lambda \implies 0 < e^{-\lambda f(x)} <  e^{-\lambda a}\\
+0 < \int_{Q^c}e^{-\lambda f(x)} d\gamma(x) < \int_{Q^c}e^{-a \lambda} d\gamma(x) < e^{-a \lambda} \gamma(Q^c)\\
+\end{align*}
+Thus, we have proved the validity of \eqref{eq:Six}, to obtain
+\begin{align*}
+\gamma(Q) \leq e^{a \lambda }\int_{\mathcal{R}^n}e^{-\lambda f(x)} d\gamma(x)
+\end{align*}
+
+\hrulefill \vspace{2 pt}
+
+\textbf{Q7. }
+
+Using the following substitution, $f(x) = ||x||^2 /2$ and $a = (n - \delta )/2$, we get
+\begin{align}
+Q &= \{x\in \mathcal{R}^n : ||x||^2 /2 \leq (n - \delta )/2 \}\notag \\ 
+&= \{x\in \mathcal{R}^n : ||x||^2  \leq (n - \delta) \}
+\end{align}
+Further, substituting into \eqref{eq:MainInequality} we get
+\begin{align*}
+\gamma(Q) &\leq e^{\lambda (n - \delta)/2} \int_{\mathcal{R}^n} e^{-\lambda ||x||^2/2} d\gamma(x)\\
+&\leq e^{\lambda (n - \delta)/2} \int_{\mathcal{R}^n} e^{-\lambda ||x||^2/2} \bigg((2\pi)^{-n/2}e^{||x||/2} dx_1 \cdots dx_n \bigg)\\
+&\leq \frac{e^{\lambda (n - \delta)/2}}{(2\pi)^{n/2}} \int_{\mathcal{R}^n} e^{-(\lambda + 1)||x||^2 /2} dx
+\end{align*}
+
+\hrulefill \vspace{2 pt} 
+
+\textbf{Q8. }
+Using the substitution $y = x\sqrt{1 + \lambda}$, $\lambda = \delta/ (n - \delta)$ and using the result
+\begin{align}
+\frac{1}{(2\pi)^{n/2}} \int_{\mathcal{R}^n} e^{-\frac{\lambda + 1}{2} ||x||^2}dx = (1 + \lambda)^{-n/2}
+\end{align}
+we proceed as follows
+\begin{align*}
+\lambda(n - \delta) = \delta \implies (1 + \lambda) = \frac{n}{n - \delta}
+\end{align*}
+
+\begin{align*}
+\gamma(Q) &\leq e^{\lambda (n - \delta)/2} \bigg( \frac{1}{(2\pi)^{n/2}} \int_{\mathcal{R}^n} e^{-(\lambda + 1)||x||^2 /2} dx \bigg)\\
+&\leq e^{\delta/2} (1 + \lambda)^{-n/2}\\
+&\leq e^{\delta/2} \bigg(\frac{n  - \delta}{n}\bigg)^{n/2}
+\end{align*}
+
+\hrulefill \vspace{2 pt}
+
+\textbf{Q9. }
+Let $\epsilon = \delta/n $, then we have $n-\delta = n(1-\epsilon)$ and
+\begin{align*}
+\gamma(Q) &\leq e^{\delta/2}(\frac{n-\delta}{n})^{n/2}\\
+&\leq e^{n\epsilon /2}(1 - \epsilon)^{n/2}\\
+\log{\gamma(Q)} &\leq  \frac{n}{2}\big( \log(1-\epsilon) + \epsilon \big)\\
+&\leq \frac{n}{2}(\frac{- \epsilon^2}{2})
+\end{align*}
+where we use the result, $\log(1-x)+x \leq -x^2/2$.
+
+\hrulefill \vspace{2 pt}
+
+\textbf{Q10. }
+Using similar methods, we can derive the following results
+\begin{align}
+\gamma \bigg\{ x\in \mathcal{R}^n \colon ||x||^2 \geq \frac{n}{1-\epsilon} \bigg\} \leq e^{-n\epsilon^2 / 4} \label{eq:Eleven}
+\end{align}
+and
+\begin{align}
+\gamma \bigg\{ x\in \mathcal{R}^n \colon ||x||^2 \geq n(1+ \epsilon) \bigg\} \leq e^{-n\epsilon^2 / 8} \label{eq:Twelve}
+\end{align}
+
+From\eqref{eq:Eleven} we note that
+\begin{align*}
+\gamma \bigg\{ x\in \mathcal{R}^n \colon \bigg(\frac{||x||^2}{n} - 1 \bigg) \leq -\epsilon  \bigg\} \leq e^{-n\epsilon^2 / 4}
+\end{align*}
+and from \eqref{eq:Twelve} we have
+\begin{align}
+\gamma \bigg\{ x\in \mathcal{R}^n \colon \bigg( \frac{||x||^2}{n} - 1 \bigg) \geq \epsilon  \bigg\} \leq e^{-n\epsilon^2 / 8} 
+\end{align}
+Combining the above two results, we obtain
+\begin{align}
+\gamma \bigg\{ x\in \mathcal{R}^n \colon \bigg| \frac{||x||^2}{n} - 1 \bigg| \geq \epsilon  \bigg\} &\leq 2* \text{Max}(e^{-n\epsilon^2 / 8},e^{-n\epsilon^2 / 4}) \\
+&\leq 2e^{-n\epsilon^2 / 8} \label{eq:Thirteen}
+\end{align}
+
+\hrulefill \vspace{2 pt}
+
+\textbf{Q11. Explain why this result shows that the Gaussian measure is concentrated on the sphere of radius of $\sqrt{n}$ with a decay of $e^{-\epsilon^2/8}$.}
+
+Note that by definition, i.e.
+\begin{align*}
+Q = \bigg\{ x\in \mathcal{R}^n \colon \bigg| \frac{||x||^2}{n} - 1 \bigg| \geq \epsilon  \bigg\}
+\end{align*}
+the set Q consists of all points in n-dimensional space with the square of ratio of its norm to a circle of radius $r = \sqrt{n}$ being separate from Unity($1$) by a margin of $\epsilon$. 
+The Gaussian Measure of set Q, $\gamma(Q)$ is exponentially decreasing in $\epsilon$, as suggested by \eqref{eq:Thirteen}, suggesting that the Gaussian measure in n-dimensional space is concentrated on a sphere of radius $\sqrt{n}$.
+
+\hrulefill \vspace{2 pt}
+\subsection{Algo 2: Generate Uniform samples on sphere $S^{n-1}(r)$}
+
+$N = 10,000$ points on the sphere $S^{n-1}(1)$ are sampled using the given algorithm. 
+The projections of the points on the $x_1$ axis is derived. The histogram of the projections in Figure(\ref{fig:que12}), along with the mean and variance of the distributions in Figure(\ref{fig:que13}) are obtained.
+
+We observe that the projections of the points are distributed as a Gaussian with exponentially decreasing variance as the number of spatial dimensions increases. 
+This implies that as the spatial dimension increases, with very high probability the projection of an arbitrary point in the Unit-Ball shall equal Zero. 
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q12_histProjections.eps}\\
+\caption{Q12. Histogram of projections of points sampled on Sphere $S^{n-1}(1)$ for n = {4, 25, 100, 225, 400}}
+\label{fig:que12}
+\end{figure}
+
+ \begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q13_meanVar_Projections.eps}\\
+\caption{Q13. Plot of Mean and Variance of above distributions as a function of n}
+\label{fig:que13}
+\end{figure}
+
+
+
+
+\textbf{Q14. Determine $\epsilon(n)$ such that $0.99N$ points in the slab $ {x = (x_1, ..., x_n ) \in S^{n-1}(1): -\epsilon(n) \leq x_1 \leq \epsilon(n)}$.}
+
+In Figure(\ref{fig:que14_slab}), we try to determine the thickness of the slab, that shall contain 0.99N of the generated points. We expect that as the number of dimensions increases, the thickness of the slab decreases exponentially as more and more points get projected closer to Zero($0$). The related pattern is obtained by plotting the cummulative frequency of points within a given thickness of slab in Figure(\ref{fig:que14_slab_vary}). The curves with steepest slope corresponds to sample points in the higher n-dimensional space.
+
+
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q14_slab.eps}\\
+\caption{Plot of $\epsilon(n)$ as a function of spatial dimension $n$.}
+\label{fig:que14_slab}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q14_slab_2.eps}\\
+\caption{Plot of sample-counts-vs- $\epsilon(n)$ to determine bandwidth for different spatial dimensions, $n$.}
+\label{fig:que14_slab_vary}
+\end{figure}
+
+
+
+
+\textbf{Q15. Do you think the choice of the axis is important for the results obtained? Justify your answer.}
+
+It is important to note that, the choice of the direction/axis of projection determines the magnitude of the obtained value of projection. It is known from theory that if a direction along a diagonal of the cube is chosen, then the projection of the points in the sphere upon the diagonal shall have a length of Unity$(1)$, while the projections along the orthogonal axis shall have length Zero($0$).
+
+Therefore, the choice of projecting the points to either of the orthogonal axis $x_1, x_2, \cdots x_n$ are equivalent, as the projections shall concentrate about Origin(Zero). However, the choice of direction along a diagonal of the Cube shall have projections that concentrate around Unity(One).
+
+\section{Algo 3: Uniform sampling in the Ball, $B^n(\sqrt(n))$} 
+ 
+$N = 10,000$ points inside Unit Sphere $B^n(\sqrt{n})$ are generated by sampling with Uniform Measure. Projections of the points on the $x_1$ axis is computed. The histogram of the projections and the mean/variance of the distribution of these projections is computed and plotted for $n = {4,25,100,225,400}$.
+
+In an n-dimensional space, we expect the ball of radius $r=\sqrt{n}$ to have Unit-Volume i.e. $Volume(B^n(\sqrt{n})) = 1$. It is observed that, all the projections are approximately Gaussian Distributed($\mu=0, \sigma^2 = 1$) independent of the dimension of the space($n$) considered. 
+
+   \textbf{Q19. What curve would you expect to find when measuring the relative volume of a slab of thickness 1/2 in the $B^n(\sqrt{n})$?}
+Further, from the nature of the histogram, we expect that the relative volume $w(n)$ to remain approximately constant. 
+This is verified by the plot of the relative volume obtained in Figure(\ref{fig:que19}).
+
+\textbf{Q20. Is the choice of axis of any consequence for the above results?}
+The choice of the axis among the orthogonal axes $x_1, x_2, \cdots x_n$ is not important for the results in the above questions. However, as earlier, the choice of axes along diagonal of a cube with edges along the orthogonal axis, would indicate different results. 
+
+\textbf{Q21. Plot histogram of the distances of the points from the origin}
+The histogram of the distances of the points sampled in $B^n(\sqrt{n})$ is presented in Figure(\ref{fig:que21_histNorm}). We note that the points sampled unifromly inside a n-dimensional ball of radius $r =\sqrt{n}$ are concentrated in a thin shell. 
+
+The apparent paradox, is that though the projections of sample-points uniformly sampled inside a sphere are approximately gaussian distributed about Origin, the points are concentrated within a thin-shell about the radius of the Sphere. The n-dimensional solid-sphere has "EMPTY SPACE" inside it and consists of a "THIN SHELL-CRUST" harbouring the entire volume of the sphere. 
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q17.eps}\\
+\caption{Q17. Histogram of projection of uniformly sampled points inside Unit Sphere upon axis $x_1$ with varying spatial dimension $n$.}
+\label{fig:que17}
+\end{figure}
+
+ 
+  \textbf{Q18. }
+ \begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q18_meanVar.eps}\\
+\caption{Q18. Plot of mean and variance of the distributions of projection of uniformly sampled points inside Unit Sphere upon axis $x_1$ as a function of spatial-dimension $n$.}
+\label{fig:que18}
+\end{figure}
+
+  
+
+
+   
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q19_slab.eps}\\
+\caption{Q.19. Plot of Relative Volume $w(n)$ measured in a slab of thickness 1/2 in $B^n(\sqrt{n})$ as a function of spatial dimension $n$.}
+\label{fig:que19}
+\end{figure}
+
+  
+    \textbf{Q20. }
+\textbf{Do you think the choice of axis is important for the above results? Justify your answer!}
+
+    
+     \textbf{Q21. }
+     
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q21_histNorm.eps}\\
+\caption{Q.21. Histogram of $||x||$ for uniformly sampled points in $B^n(\sqrt{n})$ for spatial-dimension $n = {1, ..., 400}$.}
+\label{fig:que21_histNorm}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q21_meanVar.eps}\\
+\caption{Q.21. Mean and variance of above distributions of $||x||$ for uniformly sampled points in $B^n(\sqrt{n})$}
+\label{fig:que21_meanVar}
+\end{figure}
+
+ 
+ \section{Empirical distribution of eigenvalues and singular values}
+ 
+\textbf{Q23. }
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q23_WG.eps}\\
+\caption{Q23. Wigner Gaussian: Scatter plot of $\lambda_{min}$ and $\lambda_{max}$ over 100 realizations for n={10, 50, 100, 500, 1000}. }
+\label{fig:que23_WG}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q23_BE.eps}\\
+\caption{Q23. Bernoulli Ensemble: Scatter plot of $\lambda_{min}$ and $\lambda_{max}$ over 100 realizations for n={10, 50, 100, 500, 1000}. }
+\label{fig:que23_BE}
+\end{figure}
+
+
+
+
+
+\textbf{Q24. Find the line of best-fit to guess the dependency of $\lambda$ and $\lambda$ with spatial-dimension $n$. }
+The line of best-fit was computed for the plots of $\lambda$-vs-$log(n)$.
+
+For the Wigner Gaussian Matrices we obtained the straight-line equations as
+\begin{align*}
+\lambda_{max} &= 12.0643 *log(n) -26.6017 \\
+\lambda_{min} &= -11.9874 *log(n) + 26.6017 
+\end{align*}
+
+For the Wigner Bernoulli Ensembles, we obtained the straight-line equations as
+\begin{align*}
+\lambda_{max} &= 12.4254 *log(n) - 29.1955 \\
+\lambda_{min} &= -12.4371 *log(n) + 29.3655 
+\end{align*}
+
+
+\textbf{Q26. }
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q26_BR.eps}\\
+\caption{Q26. Scatter-plot of normalized eigenvalues of asymmetric Bernoulli random matrices with n={10, 50, 100, 500, 1000} over 100 realizations}
+\label{fig:que26_BR}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q26_BR_hist.eps}\\
+\caption{Q26. Histogram of real and imaginary components of the above normalized eigenvalues}
+\label{fig:que26_BR_hist}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q26_GR.eps}\\
+\caption{Q26. Scatter-plot of normalized eigenvalues of asymmetric Gaussian random matrices with n={10, 50, 100, 500, 1000} over 100 realizations}
+\label{fig:que26_GR}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{hw1q26_GR_hist.eps}\\
+\caption{Q26. Histogram of real and imaginary components of the above normalized eigenvalues}
+\label{fig:que26_GR_hist}
+\end{figure}
+
+\hrulefill
+
+
+\textbf{Q27. }
+\textbf{Conjecture on limit distribution of spectrum of random square matrices with independent entries which are non-symmetric} 
+
+The spectruc of random square matrices with independent entries is lies within a circle in the complex plane with radius $r=1.5$ . Most of the eigenvalues are concentrated about the Real-Axis. However, they are symmetrically distributed about the origin, with maximum number of eigenvalues being concentrated nearer to the origin than farther away from it. The plots of the real and imaginary components of the eigenvalues for the random matrices are shown in the figures. 
+ 
+\end{document}
+
+
+
+

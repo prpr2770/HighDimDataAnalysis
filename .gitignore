@@ -239,3 +239,10 @@ pip-log.txt
 *.mp3
 *.jpg
 *.eps
+
+#############
+## LaTex
+#############
+
+*.aux
+*.synctex.gz

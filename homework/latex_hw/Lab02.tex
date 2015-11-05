@@ -1,0 +1,352 @@
+\documentclass[11pt]{article}
+\usepackage{amsthm,amssymb,graphicx,graphicx,multirow,amsmath,cite}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{epstopdf}
+\usepackage{etoolbox}
+\include{notation}
+\oddsidemargin=0.15in
+\evensidemargin=0.15in
+\topmargin=-.5in
+\textheight=9in
+\textwidth=6.25in
+%\bootrue{Advanced}
+
+\newtheorem{lemma}{Lemma}{}
+  \newtheorem{thm}{Theorem}
+  \newtheorem{theorem}{Theorem}
+  \newtheorem{prop}{Proposition}
+  \newtheorem{cor}[thm]{Corollary}
+  \newtheorem{defi}[thm]{Definition}
+  \newtheorem{definition}[thm]{Definition}
+  
+  %% USE THESE IN YOUR TEX CODE.
+\def\E{\mathbb{E}} % For Expectation
+\def\P{\mathbb{P}} % for probabiltiy
+\def\EE{\mathbb{E}^{!o}} % For Palm expectation
+\def\ie{{\em i.e.}} 
+\def\eg{{\em e.g.}}
+\def\V{\operatorname{Var}}
+\def\L{\mathcal{L}} % For Laplace transform
+\def\i{\mathbf{1}} % Indicator random variable
+\def\l{\ell}% For path loss moel
+
+\begin{document}
+\input{preamble.tex}
+\labreport{2}{09/27/2015}{The Group Structure of $S^{n-1}$}{Prasanth Prahladan}{100817764}
+
+
+\textbf{1. Prove that O(n) is a group when equipped with matrix multiplication.}\\
+Let $U_1,U_2 \in O(n)$. Therefore, by definition we have $U_i^T*U_i = U_i*U_i^T = I_n$. Define $P = U_1*U_2$ and $Q = U_2*U_1$. 
+\begin{align*}
+P^T*P = (U_1*U_2)^T*(U_1*U_2) = (U_2^T*U_1^T)*(U_1*U_2) = U_2^T*(U_1^T*(U_1)*U_2 = I_n
+\end{align*}
+Similarly, we can prove $P*P^T = I_n$ and $Q*Q^T = Q^T*Q = I_n$. Therefore, $P, Q \in O(n)$. Hence, O(n) is a group when equipped with the matrix multiplication operation.
+
+\hrulefill
+
+\textbf{2. Prove that $U \in O(n) \implies det(U) = \pm 1$.}\\
+Since, $U_i^T*U_i = U_i*U_i^T = I_n$ and $det(MN) = det(M)det(N)$ we have 
+\begin{align*}
+det(U)^2 = det(I_n) = 1 \implies det(U) = \pm 1.
+\end{align*}
+
+\hrulefill
+
+\textbf{3. Prove that SO(n) is a subgroup of O(n).}\\
+Let $U_1, U_2 \in SO(n)$. Therefore, $det(U_i) = 1$ and $U_i^T*U_i = U_i*U_i^T = I_n$.Define $P = U_1*U_2$ and $Q = U_2*U_1$. \begin{align*}
+det(P) = det(Q) &= det(U_1)*det(U_2) = 1\\
+P^T*P = P*P^T &= I_n = Q^T*Q = Q*Q^T 
+\end{align*}
+Therefore, $P,Q \in SO(n)$.
+Further, we know that $U_i^{-1} \in SO(n)$ such that $U_i^{-1}*U_i = I_n \in SO(n)$. Therefore, $\tilde{Q} =  U_1^{-1}*U_2^{-1} \in SO(n)$ and $\tilde{P} = U_2^{-1}*U_1^{-1} \in SO(n)$.
+\begin{align*}
+P*\tilde{P} =  (U_1*U_2)*(U_2^{-1}*U_1^{-1}) & = U_1*(I_n)*U_1^{-1} = I_n\\
+Q*\tilde{Q} &= I_n
+\end{align*} 
+which proves that, $\tilde{P} = P^{-1}$ and $\tilde{Q} = Q^{-1}$. Thus, SO(n) is a subgroup of O(n).
+
+\hrulefill
+
+\textbf{4. Consider the subset $\mathcal{G}$ of SO(n) defined by
+\begin{align*}
+\mathcal{G} = {U \in SO(n) , Ue_1 = e_1}
+\end{align*}
+where $e_1$ is the first element of the canonical basis in $\mathcal{R}^n$. Prove that $\mathcal{G}$ is a subgroup of SO(n).}\\
+Let $G_1, G_2 \in \mathcal{G} \subset SO(n)$. Therefore, $G_i e_1 = e_1$. Define $P = G_1*G_2 \in SO(n)$.
+\begin{align*}
+Pe_1 &= (G_1*G_2)e_1 = G_1(e_1) = e_1\\
+\end{align*} Therefore, $P \in \mathcal{G}$.
+Further, we observe that
+\begin{align*}
+e_1 &= G_ie_1\\
+G_i^{-1}e_1 &= G_i^{-1}*G_i e_1 = I_ne_1 = e_1
+\end{align*}
+Therefore, $G_i^{-1} \in \mathcal{G}$ and
+\begin{align*}
+P^{-1}e_1 = (G_1*G_2)^{-1}e_1 = G_2^{-1}*G_1^{-1}e_1 = G_2^{-1}e_1 = e_1
+\end{align*}
+This implies that $P \in \mathcal{G}$ and hence, $\mathcal{G}$ is a Subgroup of SO(n).
+
+\hrulefill
+
+\textbf{5. Prove that every element $U \in \mathcal{G}$ can be written as below with $W \in SO(n-1)$
+\begin{align}
+U = \bigg[
+\begin{array}{cc}
+1 & 0\\
+0 & W
+\end{array}
+\bigg] \label{eq:modifiedU}
+\end{align}
+}
+Let $\{ u_1 , u_2, u_3, \cdots u_n \}$ be the n-column vectors defining $U =[ u_1 u_2 \cdots u_n]\in \mathcal{G}$. We have, $Ue_1 = e_1 \implies u_1 = e_1$. Since, rank$(U) = n$, and $\{u_i\}$ are all orthogonal vectors, we know that $ \{u_2, \cdots u_n\}$ form a set of (n-1) independent vectors. Its possible to determine a rotation($K \in SO(n)$) of these (n-1) vectors such that their first-component is 0. Therefore, $K[u_i] = [0 v_i]'$ where $\{v_i\}$ form a set of (n-1) linearly independent orthogonal (n-1) dimensional vectors.
+\begin{align*}
+U = \bigg[\begin{array}{cc}
+1 & \bar{x}'\\
+\bar{0} & M
+\end{array}\bigg] &\xrightarrow{K \in SO(n)}
+\bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W
+\end{array}\bigg] = V \in \mathcal{G}
+\end{align*} where $\bar{x} \in \mathcal{R}^{n-1}$. Further, note that
+\begin{align*}
+det(V) &= det(KU) = det(K)*det(U) = 1\\
+&= 1.det(W)\\
+V^T*V  &= \bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W^TW  
+\end{array} \bigg] = I_n
+\end{align*}
+Therefore, $W \in (n-1)\times(n-1)$ real matrix with $det(W) = 1$ and $ W^T * W = W * W^T = I_{n-1}$. Hence, $W \in SO(n-1)$.
+
+\hrulefill
+
+\textbf{6. Prove that $\Psi: \mathcal{G} \rightarrow SO(n-1)$ such that $\Psi(U) = W$ in \eqref{eq:modifiedU} is an 'isomorphism' between $\mathcal{G}$ and SO(n-1).}\\
+Consider elements $U_1, U_2 \in \mathcal{G}$ and $\Psi(U_i) = W_i$ where $W_i \in SO(n-1)$, $U_i \in \mathcal{G}$ and
+\begin{align}
+U_i &= \bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W_i
+\end{array}\bigg]. 
+\end{align}.
+We can make the following observations
+\begin{align*}
+U_1*U_2 &= \bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W_1
+\end{array}\bigg]*
+\bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W_2
+\end{array}\bigg]\\  
+&= \bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W_1*W_2
+\end{array}\bigg]\\
+\Psi(U_1*U_2) &= W_1*W_2 = \Psi(U_1)*\Psi(U_2)
+\end{align*}
+
+\begin{enumerate}
+\item \emph{Surjective:} $\forall W \in SO(n-1)$ we can construct $U$ such that
+\begin{align}
+U &= \bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W
+\end{array}\bigg]. 
+\end{align}
+Note that, $det(U) = 1.det(W) = 1$, $U^TU = UU^T = I_n$ and $Ue_1 = e_1$. Therefore, $U \in \mathcal{G}$ and 
+$\Psi(\cdot)$ is a surjective function.
+\item \emph{Injective:} Let $W_1 = W_2$ where $W_i = \Psi(U_i)$, $W_i \in SO(n-1)$ and $U_i \in \mathcal{G}$. Therefore,
+\begin{align*}
+\Psi(W_1) &= \Psi(W_2)\\
+\bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W_1
+\end{array}\bigg] &= \bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W_2
+\end{array}\bigg]\\
+U_1 &= U_2\\
+\Psi(U_1) = \Psi(U_2) &\implies U_1 = U_2
+\end{align*}
+Hence, $\Psi(\cdot)$ is an injective function.
+\end{enumerate}
+From the discussion above, we prove that $\Psi(\cdot)$ is a bijective and an Isomorphism between $\mathcal{G}$ and SO(n-1).
+
+\hrulefill
+
+\textbf{7. Prove that $\forall x \in S^{n-1} \exists U \in SO(n)$ such that $Ue_1 = x$. Is U unique? }\\
+Let $\{u_1, u_2, \cdots u_n\}$ be the columns of the matrix $U \in SO(n)$. If $u_1 = x$, then we obtain $Ue_1 = x$. Therefore, we also require that the n-1 column vectors $\{u_2,\cdots u_n\}$ be orthogonal to x.
+\begin{align*}
+U = \bigg[\begin{array}{cccc}
+x &u_2 &\cdots &u_n
+\end{array}\bigg] \in SO(n)
+\end{align*}
+Note, that any rotation of the matrices $u_{i} \neq x$ can be used to construct U. Hence, $U \in SO(n)$ is not unique.
+
+
+
+\hrulefill
+
+\textbf{8. Prove that if $U,V \in SO(n)$ such that $Ue_1 = Ve_1 = x$, then there exits $W \in SO(n-1)$ such that
+\begin{align*}
+U = V*\bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W
+\end{array}\bigg]
+\end{align*}
+}
+\\
+Let $G \in \mathcal{G} \subset SO(n)$. From above, we know that $\exists W \in SO(n-1)$
+\begin{align*}
+Ge_1 &= e_1\\
+G &= \bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W
+\end{array}\bigg]
+\end{align*}
+We make the following observations
+\begin{align*}
+x &= Ve_1 = V*(G e_1)\\
+&= U e_1\\
+U &= V*G = V*\bigg[\begin{array}{cc}
+1 & \bar{0}'\\
+\bar{0} & W
+\end{array}\bigg]
+\end{align*}
+
+\hrulefill
+
+\textbf{9. Prove that if $U_1$ and $U_2$ are two coset representatives for the same coset then $U_1 \mathcal{G} = U_2 \mathcal{G}$.}\\
+$U\mathcal{G}$ is the coset defined by $U \in SO(n)$ and contains $V = UG, \forall G\in \mathcal{G}$.
+The set of all cosets $\{U\mathcal{G}\} = SO(n)/\mathcal{G}$, is called the 'quotient-group'.
+
+Let $U\mathcal{G}$ be the coset under consideration, with coset-representations $V_1, V_2 \in U\mathcal{G}$. Therefore, by definition we have for $G_1, G_2 \in \mathcal{G}$
+\begin{align*}
+U = V_1 G_1 = V_2 G_2\\
+\end{align*}
+Further, 
+\begin{align*}
+V_1\mathcal{G} = \{ X | V_1 = X G, \forall X \in SO(n), \forall G \in \mathcal{G} \text{ and } V_1 \in SO(n)\}\\
+V_2\mathcal{G} = \{ Y | V_2 = Y G, \forall Y \in SO(n), \forall G \in \mathcal{G} \text{ and } V_2 \in SO(n)\}
+\end{align*}
+ We note the following
+ \begin{align*}
+ V_1\mathcal{G} &= \{ X | V_1 = X G, \forall X \in SO(n)\}\\ 
+ &= \{ X | V_1G_1 = XGG_1, \forall X \in SO(n)\}\\ 
+    &= \{ X | V_2G_2 = XGG_1, \forall X \in SO(n)\}\\ 
+        &= \{ X | V_2 = XGG_1G_2^{-1}, \forall X \in SO(n)\}\\
+                &= \{ X | V_2 = X\tilde{G}, \forall X \in SO(n)\}\\
+                &= V_2\mathcal{G}
+ \end{align*}
+
+
+\hrulefill
+
+\textbf{10. Define the map $\Phi:SO(n)/\mathcal{G} \rightarrow S^{n-1}$ such that $U \mapsto \Phi(U) = Ue_1$. Prove that $\Phi(\cdot)$ represents the action of SO(n) i.e. $\forall \Omega \in SO(n), \forall U \in SO(n)/\mathcal{G}$ 
+\begin{align*}
+\Phi(\Omega U )= \Omega \Phi(U)
+\end{align*}
+}
+Let $x \in S^{n-1}$. We know $\exists U \in SO(n)/\mathcal{G}$ such that $Ue_1 = x$. By definition, $\Phi(U) = Ue_1 = x$
+\begin{align*}
+\Phi(\Omega U) = (\Omega U) e_1 &= \Omega(U e_1)= \Omega \Phi(U)
+\end{align*}
+Hence, $\Phi(\cdot)$ represents the action of SO(n).
+
+
+\hrulefill
+
+\textbf{11. Prove that the map $\Phi(\cdot)$ is bijective and continuous.}\\
+To prove that $\Phi(\cdot)$ is bijective, we proceed as follows
+\begin{enumerate}
+\item \emph{Injective} Let $x_1 = x_2 = \tilde{x}$, where $\Phi(U_i) = U_ie_1 = x_i$. Therefore, we have
+\begin{align*}
+x_1 &= x_2\\
+\Phi(U_1) &= \Phi(U_2)\\
+U_1 e_1 &= U_2 e_1 \\
+&= U_2 G e_1
+\end{align*} where $G \in \mathcal{G}$. Therefore, $U_1,U_2 \in U_1\mathcal{G}$ i.e they belong to the same equivalence class. Therefore,there exits a unique $\tilde{U} \in SO(n)/\mathcal{G}$ such that $U_1 = U_2 = \tilde{U}$.
+Hence, $\Phi(\cdot)$ is injective.
+\item \emph{Surjective}
+For any $x \in S^{n-1}$, there exists non-unique $U \in SO(n)$ such that $Ue_1 = x$. By using the equivalence rule, $U = VG, G\in \mathcal{G}$, there exists a unique $U \in SO(n)/\mathcal{G} \forall x$ such that $Ue_1 = x$. Therefore, $\Phi(\cdot)$ is a surjective function. 
+\end{enumerate}
+From the above discussion, we learn that $\Phi(\cdot)$ is a bijective function. 
+
+To prove that $\Phi(\cdot)$ is continuous, we use the notion that images of a converging sequence of points in the domain, form a converging sequence in the range of the map i.e. 
+\begin{align*}
+\lim_{n\to \infty} \Omega_n \rightarrow \Omega \implies \lim_{n\to \infty} \Phi(\Omega_n)\text{ exists}.
+\end{align*}
+
+We define convergence in the domain, using the Frobenius norm i.e.
+\begin{align*}
+\lim_{n\to \infty} \Omega_n \rightarrow \Omega \implies \lim_{n\to \infty} ||\Omega_n - \Omega||_{F} \rightarrow 0
+\end{align*}
+
+We observe that
+\begin{align*}
+\lim_{n\to \infty} || \Phi(\Omega_{n+1}) - \Phi(\Omega_{n})|| &= \lim_{n\to \infty} || \Omega_{n+1}e_1 - \Omega_n e_1||\\
+&\leq \lim_{n\to \infty} ||\Omega_{n+1} - \Omega_n|| ||e_1|| \rightarrow 0
+\end{align*}
+Therefore, $\lim_{n\to \infty} \Phi(\Omega_{n})$ exists! 
+Hence, $\Phi(\cdot)$ is a continuous mapping.
+
+
+\hrulefill
+
+Conclusion: 
+\begin{align*}
+\mathcal{G} &\xrightarrow{isomorphism} SO(n-1)\\
+SO(n)/\mathcal{G} &\leftrightarrow SO(n)/SO(n-1)\\
+S^{n-1} &\xrightarrow{homeomorphism} SO(n)/\mathcal{G}\\ 
+S^{n-1} &\leftrightarrow SO(n)/SO(n-1)\\
+\end{align*}
+
+We thus conclude that the Sphere $S^{n-1}$ can be identified with the Quotient Group, $SO(n)/SO(n-1)$. And thus properties of Group Action, Group Symmetries can be used to understand it. Further, the topological Group structure of the Sphere, permits us to define a Haar Measure on it, which shall then be used to measure the set of points under study.
+
+\hrulefill
+
+\hrulefill
+
+\definition[Group]{A group is non-empty set G with an operation * and satisfying the following properties
+\begin{enumerate}
+\item for any $f, g\in G$, $h*g \in G$
+\item for any $f, g, h \in G$, $f*(g*h) = (f*g)*h$
+\item $\exists e \in G$ such that for any $g \in G$, $g*e = e*g = g$
+\item for any $g \in G$, $\exists g^{-1} \in G$, such that $g*g^{-1} = g^{-1}*g = e$
+\end{enumerate}
+
+\definition[Subgroup]{A subset H of G is a subgroup if 
+\begin{enumerate}
+\item for any $g,h \in H$, $h*g \in H$
+\item for any $g \in H$, $\exists g^{-1} \in H$, such that $g*g^{-1} = g^{-1}*g = e$
+\end{enumerate}
+
+\definition[Orthogonal Group, O(n)]{
+The orthogonal group $O(n)$ is the subset of $n\times n$ real matrices U such that $U^T*U = U*U^T = I_n$, where $I_n$ is the $n\times n$ Identity Matrix.
+}
+
+\definition[Special Orthogonal Group, SO(n)]{
+SO(n) consists of the elements of O(n) with determinant 1 i.e. the rotations.
+}
+
+\definition[Homomorphism]{
+A function $\phi: (G,*) \rightarrow (F,\Delta)$ is called a homomorphism if $\phi$ commutes with Group Operations
+\begin{align*}
+\forall G_1, G_2 \in G, \phi(G_1*G_2) = \phi(G_1)\Delta \phi(G_2)	
+\end{align*} 
+}
+
+\definition[Isomorphism]{ Let $f:(G,*)\rightarrow (F,\Delta)$ be a homomorphism. f is an ismomorphism if f is bijective i.e $f^{-1}$ exits and $f^{-1}$ is also a homomorphism.
+}
+
+\definition[Equivalence Class]{ Two matrices U and V are equivalent under a relation if $Ue_1 = Ve_1 = x$, or equivalently there exists $Q \in \mathcal{G}$ such that $U = VQ$. Let $U \in SO(n)$. The Left-Coset is defined as $U\mathcal{G} = \{V| V\in SO(n-1), V = UQ, Q \in \mathcal{G}\}$} where V is called 'coset representative'.
+
+\definition[Quotient Group]{The set of left-cosets is called Quotient Group, denoted by $SO(n)/\mathcal{G}$.}
+ 
+\end{document}
+
+
+
+
