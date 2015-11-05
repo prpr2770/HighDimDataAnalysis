@@ -25,7 +25,7 @@ C{1} = strrep(C{1},'.mp3','.wav');
 % celldisp(C)
 
 
-wavfileGenreDict = containers.Map(C{1},C{2})
+wavfileGenreDict = containers.Map(C{1},C{2});
 
 genreKeys = {'rock_pop', 'classical', 'electronic', 'jazz_blues', 'metal_punk', 'world'};
 genreValues = {'rockp', 'class', 'elect', 'jazzb', 'metal', 'world'};
@@ -35,7 +35,7 @@ genreRenameDict = containers.Map(genreKeys, genreValues);
 % Accessing the tracks and updating their names
 
 dirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\'
-Files=dir(dirName)
+Files=dir(dirName);
 
 % define new Directory Name
 csvDataDir = fullfile(dirName,'csvData');
@@ -46,8 +46,8 @@ for k=1:length(Files)
         wavName=Files(k).name;
         
         % determine genre
-        genreName = wavfileGenreDict(wavName)
-        renameGenre = genreRenameDict(genreName)
+        genreName = wavfileGenreDict(wavName);
+        renameGenre = genreRenameDict(genreName);
         
         %remove the .wav extension
         fileName = wavName(1:end-4);

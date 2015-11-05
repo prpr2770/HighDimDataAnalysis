@@ -1,3 +1,14 @@
+function wavWindows = extractWindowsFromSong(wavFile, Fs)
+%{
+Input:
+wavFile : row-vector of the audio-clip to be dissected
+Fs : Sampling frequency
+
+Output:
+All the windows as rows of a matrix.
+%}
+
+
 % Obtain a song. And reshape the 1-D vector into a 2-D vector of 256 columns.
 % Basically, generating overlapping intervals of songs - with each interval being 256 length.
 
@@ -9,18 +20,22 @@
 
 % ------------------------------------------------------------------
 % we want to cut songs into 100ms intervals? Fs = 11025
+% 
+% close all; clear all; clc
+% 
+% hfile2 = 'artist_1_album_1_track_1.wav';
+% % hfile2 = 'artist_1_album_1_track_2.wav';
+% % hfile2 = 'artist_78_album_1_track_3.wav';
+% 
+% wavInfo = audioinfo(hfile2)
+% [wav, Fs] = audioread(hfile2);
+% 
+% wavFile = wav'; % Ensure ROW VECTOR
+% size(wavFile)
+% ------------------------------------------------------------------
 
-close all; clear all; clc
-
-hfile2 = 'artist_78_album_1_track_3.wav'
-[wav, Fs] = audioread(hfile2);
-wavInfo = audioinfo(hfile2)
-
-wavFile = wav'; % Ensure ROW VECTOR
-size(wavFile)
-
-intervalDuration = 0.02 %seconds = 200ms % Ensures that Odd number of points.
-windowSize = ceil(intervalDuration*Fs) %221 samples!
+intervalDuration = 0.04; %seconds = 200ms % Ensures that Odd number of points.
+windowSize = ceil(intervalDuration*Fs); %221 samples!
 halfWindow = (windowSize - 1)/2;
 frameBreak = halfWindow + 1;
 
@@ -35,9 +50,9 @@ frameBreak = halfWindow + 1;
 % % ==============================================================
 
 %find the central data-point:
-lenWave = length(wavFile)
+lenWave = length(wavFile);
 if mod(lenWave,2) ~= 0 % Odd length
-    cntr = (lenWave + 1)/2
+    cntr = (lenWave + 1)/2;
 else
     cntr = lenWave/2;
 end
@@ -100,7 +115,7 @@ f_half_Matrix = f_half_temp(end:-1:1,end:-1:1);
 % ------------------------------------------------------
 % Combining all parts to obtain - Windows
 wavWindows = [f_half_Matrix; cntr_Matrix; s_half_Matrix];
-size(wavWindows)
+% size(wavWindows)
 
-
+end
 
