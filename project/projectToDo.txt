@@ -1,0 +1,61 @@
+Tasks to do:
+=========================================================
+PREPROCESSING STAGE
+---------------------------------------------
+1. Classify all tracks into folders
+2. Cut all songs in each category into equal segments - so that mfcc are of equal sizes/matrices.
+	Idea: We are essentially bothered about the cloud of song-sements belonging to each genre.
+Its possible that each segments of different songs are more similar to other segments of another song, than other segments of itself. 
+One challenge would be in determining the best time-interval of analysis for the songs. 
+
+Find the shortest-duration of all songs in the list. Then divide the shortest song into 6 equal segments. 
+The length of each segment becomes the interval into which all the songs shall be divided. 
+
+3. Derive the mpcc and the dct of each song cloud point
+4. Store/archive the sound-cloud-points in a meaningful manner. 
+	+ Ensure that the mpcc,dct for the entire song is also stored. ( represent a song as a unique point.)
+	+ Ensure that mpcc, dct for the song-intervals is stored (represent each song by a cloud.)
+
+5. Determine the intrinsic dimensionality of these datasets by using correlational/dimension etc.
+
+=========================================================
+
+DIMENSION REDUCTION: 
+---------------------------------------------
+a) Linear: 
+	1. Fast Johnson Lindenstrauss Transform Algorithm
+	2. 
+
+b) NonLinear:
+
+=========================================================
+CLUSTERING:
+
+a) k-means
+
+b) other-algo's
+
+=========================================================
+
+MEMBERSHIP COMPUTATION:
+
+=========================================================
+
+01-November:
+
+# Use python for the tasks below: <Implement this on test-case of points on  a sphere?>
+
+1. Create a test-case of data: Intersecting Spherical Data-Clusters
+2. Generate Refined Graph-Embedding - using method described in class
+3. Obtain Reduced Dimension representation - 3D - ScatterPlot
+
+4. Implement FastJLTransform - Compare the Data-Dim_Reduction thus obtained. 
+
+5. Spectral Clustering: Refined Embedding - implemented! 
+	+ Then clustering can be done by using KNN Search.
+
+6. Implement the entire process-flow using Matlab and Python. 
+
+Important note: The algorithms take a lot of time to implement. Need to determine ways of implementing Laplacian and other operations in a distributed manner. 
+Use Apache Spark. 
+
