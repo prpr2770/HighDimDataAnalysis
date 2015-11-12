@@ -32,8 +32,8 @@ for k=1:size(dim{1,set},2)
     fclose(fid);
     X=reshape(X,dim{1,set}(k),runs*num{1,set}(i));
     for j=1:runs
-       Z=X(:,(j-1)*num{1,set}(i)+1:j*num{1,set}(i));
-       est(k,i,j,:)=GetDim(Z);
+       Z=X(:,(j-1)*num{1,set}(i)+1:j*num{1,set}(i))
+       est(k,i,j,:)= GetDim(Z);
     end
   end
 end

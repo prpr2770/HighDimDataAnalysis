@@ -14,27 +14,28 @@ mutualDistance = zeros(totalPoints,totalPoints);
 mutualSimilarity = zeros(totalPoints,totalPoints);
 
 for i=1:totalPoints
-    for j=i:totalPoints
-        dist_ij = sqrt(sum((Dataset(i,:) - Dataset(j,:)).^2));
-        weight_ij = exp(-dist_ij^2/sigmaSqr);
-        if i~=j
-            % generate the distaneMatrix
-            mutualDistance(i,j) = dist_ij;
-            mutualDistance(j,i) = dist_ij;
-            
-            %generate the WeightMatrix
-            mutualSimilarity(i,j) = weight_ij;
-            mutualSimilarity(j,i) = weight_ij;
-            
-        else
-            % diagonal entries
-            mutualDistance(i,i) = dist_ij;
-            mutualSimilarity(i,i) = weight_ij;
-            
-        end
-        
-
+    
+    ref_vec = Dataset(i,:);
+    ref_vec_repMat = repmat(ref_vec,totalPoints,1);
+    
+    try
+        dist_ijs = (sum((ref_vec_repMat - Dataset).^2, 2) ).^(0.5); %row_sum
+        weight_ijs = exp(-dist_ijs.^2 / sigmaSqr);
+    catch 
+        warning('|ref_vec_repMat| != |Dataset|')
     end
+
+    % generate distanceMatrix
+    mutualDistance(i,:) = dist_ijs';
+    mutualDistance(:,i) = dist_ijs;
+    
+    % generate weightMatrix
+    mutualSimilarity(i,:) = weight_ijs';
+    mutualSimilarity(:,i) = weight_ijs;
+    
+    % -----------------------------------------------------------
+
+    
 end
 
 % ===========================================================
