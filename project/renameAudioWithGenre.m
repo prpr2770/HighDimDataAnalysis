@@ -6,8 +6,11 @@ close all; clear all; clc
 % ================================================================
 % Access the truth File
 
-% determine genreName from truth
+
 dirName = 'H:\HighDimData\Project\ecen5322\Volumes\project'
+
+% ------------------------------------------------------------------------
+% determine genreName from truth
 truthFileName = 'ground_truth.csv'
 fullFileName = fullfile(dirName,truthFileName)
 fileID = fopen(fullFileName);
@@ -26,9 +29,18 @@ C{1} = strrep(C{1},'.mp3','.wav');
 
 wavfileGenreDict = containers.Map(C{1},C{2})
 
+% create Dictionary of GenreName with IndexKey
+numGenres = length(genreKeys);
+genreIndx = 1:numGenres;
+genreIndxDict = containers.Map(genreKeys, genreIndx);
+% ================================================================
+
+
 genreKeys = {'rock_pop', 'classical', 'electronic', 'jazz_blues', 'metal_punk', 'world'};
 genreValues = {'rockp', 'class', 'elect', 'jazzb', 'metal', 'world'};
 genreRenameDict = containers.Map(genreKeys, genreValues);
+
+
 
 % ================================================================
 % Accessing the tracks and updating their names
@@ -42,6 +54,7 @@ wavName=Files(k).name % 'song1_track2_part1.wav'
 % determine genre
 genreName = wavfileGenreDict(wavName)
 renameGenre = genreRenameDict(genreName)
+genreIndex = genreIndxDict(genreName);
 
 
 % % 

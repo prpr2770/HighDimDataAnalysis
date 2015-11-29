@@ -1,6 +1,6 @@
 function [y2]=stationaryDist_MarkovChain(Q)
-%Q is the transition matrix of the Markov Chain. We use the method of state
-%space reduction to compute the stationary distributions of Q.
+% Q is the transition matrix of the Markov Chain. We use the method of state
+% space reduction to compute the stationary distributions of Q.
 % Source: http://www.mathworks.com/matlabcentral/answers/uploaded_files/4107/stationary.m
 syms z; 
 P=Q;

@@ -21,7 +21,7 @@ end
 
 % Choose the number of constraints to be const_factors times the number of
 % distinct pairs of classes
-k = length(unique(y));
+k = length(unique(y));                        % distinct number of classes
 num_constraints = params.const_factor * (k * (k-1));
 C = GetConstraints(y, num_constraints, l, u);
 

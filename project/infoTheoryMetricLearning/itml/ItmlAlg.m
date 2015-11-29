@@ -40,7 +40,7 @@ i = 1;
 iter = 0;
 c = size(C, 1);
 lambda = zeros(c,1);
-bhat = C(:,4);
+bhat = C(:,4); % what does this refer to ??? 
 lambdaold = zeros(c,1);
 conv = Inf;
 A = A_0;
@@ -60,12 +60,12 @@ while (true),
         gamma_proj = gamma/(gamma+1);
     end
     
-    if C(i,3) == 1
+    if C(i,3) == 1 % similar vectors
         alpha = min(lambda(i),gamma_proj*(1/(wtw) - 1/bhat(i)));
         lambda(i) = lambda(i) - alpha;
         beta = alpha/(1 - alpha*wtw);        
         bhat(i) = inv((1 / bhat(i)) + (alpha / gamma));        
-    elseif C(i,3) == -1
+    elseif C(i,3) == -1 % dis-similar vectors
         alpha = min(lambda(i),gamma_proj*(1/bhat(i) - 1/(wtw)));
         lambda(i) = lambda(i) - alpha;
         beta = -1*alpha/(1 + alpha*wtw); 

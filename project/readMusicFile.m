@@ -104,13 +104,16 @@ matDataDir = fullfile(dirName,'matData_cut')
 status = mkdir(matDataDir)
 
 
-
+fid_allSongNames = fopen('allSongNames.txt', 'at');
 
 % =====================================================================
 % =====================================================================
 
-mfcc_all_fileName = strcat(matDataDir,'\allSongs_mfcc.mat');
-mfcc_genre_fileName = strcat(matDataDir,'\allGenre_Songs_mfcc.mat');
+mfcc_all_fileName = strcat(matDataDir,'\allSongs_vec_mfcc.mat');
+mfcc_all_mat_fileName = strcat(matDataDir,'\allSongs_mat_mfcc.mat');
+
+mfcc_genre_fileName = strcat(matDataDir,'\allGenre_Songs_vec_mfcc.mat');
+mfcc_genre_mat_fileName = strcat(matDataDir,'\allGenre_Songs_mat_mfcc.mat');
 
 
 % =====================================================================
@@ -119,6 +122,10 @@ mfcc_genre_fileName = strcat(matDataDir,'\allGenre_Songs_mfcc.mat');
 countSong = 0;
 
 countGenreSongs = zeros(1, length(genreKeys));
+
+% create txt file containing all valid song names
+
+
 
 for k=1:length(Files)
     if (Files(k).bytes >0)
@@ -131,10 +138,14 @@ for k=1:length(Files)
         
         countGenreSongs = updateGenreCount(genreKeys, countGenreSongs, genreName);
         
+        
         %remove the .wav extension
         fileName = wavName(1:end-4);
         % construct full file-name
         wavFileName = fullfile(dirName,wavName);
+        
+        
+        
         
         % start reading the files
         try
@@ -224,29 +235,94 @@ for k=1:length(Files)
         save(dct_matName, 'DCT');
         clear dataFile;
         %}
+
         
+%{
+        % ================================================================
+        % write MAT files: Appended MFCC Matrices with first col discarded
+        
+        mfcc_alt = MFCC(:,2:end);  % Coeffs x Frames
+        numFrames = size(mfcc_alt,2);
+        genreIndex = getGenreIndex(genreKeys, genreName);
+        genreIndexVec = genreIndex*ones(1,numFrames);
+
+        % ----------------------------------------------------------------
+        % Store All Songs MFCC : As MFCC Matrix
+        % X: Data Frames with MFCC coefficients
+        % Y: Data Labels per Frame
+
+        if (countSong > 1)
+            [nrows,ncols]=size(mfccDataFile,'X');
+            numFrames = size(mfcc_alt,2);
+            mfccDataFile.X(:,ncols+1:ncols+numFrames) = mfcc_alt;
+            [nrows,ncols]=size(mfccDataFile,'Y');
+            mfccDataFile.Y(nrows,ncols+1:ncols+numFrames) = genreIndexVec;
+        else
+            %             mfccDataFile = matfile(mfcc_all_fileName, 'Writable', isWritable);
+            mfccDataFile = matfile(mfcc_all_mat_fileName, 'Writable', true);
+            mfccDataFile.X = mfcc_alt;
+            mfccDataFile.Y = genreIndexVec;        % Store Label of each song
+        end
+
+%}
+        
+        % ================================================================
+        % Store Genre-based MFCC files
+        
+        mfcc_alt = MFCC(:,2:end);  % Coeffs x Frames; Discard col-1
+        numFrames = size(mfcc_alt,2);
+        genreIndex = getGenreIndex(genreKeys, genreName);
+        
+        if (sum(countGenreSongs) > 1)
+            
+            if(countGenreSongs(genreIndex)> 1)
+                % obtain size of dataset stored for given genre
+                eval(['[nrows,ncols]=size(mfccGenreFile.Genre' num2str(genreIndex) ');' ])
+                % store data value
+                eval(['mfccGenreFile.Genre' num2str(genreIndex) '(:,ncols+1:ncols+numFrames) = mfcc_alt;'])
+            else
+                eval(['mfccGenreFile.Genre' num2str(genreIndex) '= mfcc_alt;'] );
+            end
+            
+        else
+            % INITIALIZE THE GENRE DATA FILE
+            %             warning('Initialize: Genre Data')
+            mfccGenreFile = matfile(mfcc_genre_mat_fileName, 'Writable', true);
+
+            % get index; update each Genre type data as Genre1, Genre2, etc.
+            eval(['mfccGenreFile.Genre' num2str(genreIndex) '= mfcc_alt;'] );
+        end
+
+
+
+%{
         % ================================================================
         % write MAT files: Appended MFCC vectors
         
         mfcc_vec = reshape(MFCC,[],1); % create Column Vector
-%         warning('Size: mfcc_vec')
-%         size(mfcc_vec)
-        %{
+        genreIndex = getGenreIndex(genreKeys, genreName);
+
         % ----------------------------------------------------------------
-        % Store All Songs MFCC
+        % Store All Songs MFCC : As MFCC Vector
+        % X: Data vectors
+        % Y: Data Labels
 
         if (countSong > 1)
             [nrows,ncols]=size(mfccDataFile,'X');
             mfccDataFile.X(:,ncols+1) = mfcc_vec;
+            [nrows,ncols]=size(mfccDataFile,'Y');
+            mfccDataFile.Y(nrows,ncols+1) = genreIndex;
         else
             %             mfccDataFile = matfile(mfcc_all_fileName, 'Writable', isWritable);
             mfccDataFile = matfile(mfcc_all_fileName, 'Writable', true);
             mfccDataFile.X = mfcc_vec;
+            mfccDataFile.Y = genreIndex;        % Store Label of each song
         end
         % delete nrows ncols
-        
-        %}
-        
+%}
+      
+
+%{
         % ----------------------------------------------------------------
         % Store Genre-based Dataset
         
@@ -281,7 +357,9 @@ for k=1:length(Files)
         
         % ================================================================
         
+%}
         
+
     end
 end
 
@@ -290,7 +368,7 @@ end
 
 
 
-
+fclose(fid_allSongNames);        
 
 
 
