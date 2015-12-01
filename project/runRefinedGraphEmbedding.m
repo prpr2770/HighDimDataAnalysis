@@ -30,15 +30,37 @@ tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\'
 g1c_SongFeatures_Dir = fullfile(tracksDirName ,'g1c_SongFeatures\')
 
 % distance matrix files
-distMatrix_txt = 'distance_matrix.txt';
-distMatrix_mat = 'distance_matrix.mat';
+% distMatrix_txt = 'distance_matrix.txt';
+distMatrix_mat = 'mn_nrm_co_mfcc_itml_D.mat';
 
 % -------------------------------------------------------------------
 % reading the distMatrix.mat file
 matfile_distMatrix = fullfile(g1c_SongFeatures_Dir, distMatrix_mat);
 distance_matrix = load(matfile_distMatrix);
 
-mutualDistance = distance_matrix.D;
+
+mutualDistance = distance_matrix.ITML_D;
+
+
+
+%{
+Distance between songs is computed using elias_pampalk's code:
+
+D(i,j) = ...
+                    0.7*(-exp(-1/450*d_g1)+0.7950)/0.1493 + ...
+                    0.1*(d_fp-1688.4)/878.23 + ...
+                    0.1*(d_fpg-1.2745)/1.1245 + ...
+                    0.1*(d_fpb-1064.8)/932.79 + ...
+                    10; %% ensure all values larger than one (+1.5 should be enough in most cases)
+            else %% not evaluated work around to deal with inv covariance problems
+                D(i,j) = ...
+                    0.4*(d_fp-1688.4)/878.23 + ...
+                    0.3*(d_fpg-1.2745)/1.1245 + ...
+                    0.3*(d_fpb-1064.8)/932.79 + ...
+                    10;
+
+%}
+
 
 % -------------------------------------------------------------------
 % refinedGraphEmbedding
@@ -70,8 +92,9 @@ colors = rand(totalColors,3);
 
 % close all
 fig2 = figure(2)
+colormap(prism(length(genreKeys)));
 % colormap(jet(length(genreKeys)));
-colormap(parula(length(genreKeys)));
+% colormap(parula(length(genreKeys)));
 
 for i = 1:length(genreKeys)
     songsOfAGenre = find(songGenres == i);
