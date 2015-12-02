@@ -30,8 +30,11 @@ data_allSongs = load(mfcc_allSongs_fileName);
 % create file: store norm_codeWordHistograms
 cw_hist_allSongs_fileName = strcat(aggregateDataDirName,'\cw_hist_allSongs.mat');
 
+% -------------------------------------------------------------------------
 % extract the global paramter/data
-norm_dyn_mfcc_allSongs = data_allSongs.norm_dyn_mfcc_allSongs;
+norm_dyn_mfcc_allSongs = data_allSongs.dyn_mfcc_allSongs;
+
+% -------------------------------------------------------------------------
 mean_dyn_mfcc = data_allSongs.mean_dyn_mfcc;
 std_dyn_mfcc = data_allSongs.std_dyn_mfcc;
 totalSongs = data_allSongs.countSong;
@@ -48,10 +51,17 @@ tau = 10;               % numNearestNbrs of frame among CodeWordClusterCenters
 iter = 5;
 X = norm_dyn_mfcc_allSongs';    % ROWVEC - Convert for ma_kmeans!
 size(X)
+tic
 [C,Qe,N,W,Q] = ma_kmeans(X, iter, numCodeWords);
+toc
 codeWordCenters = C';           % COLVEC - Convert!
 
 save(cw_hist_allSongs_fileName,'codeWordCenters');
+
+warning('clear norm_dyn_mfcc_allSongs data_allSongs X')
+clear norm_dyn_mfcc_allSongs data_allSongs X;
+
+%{
 
 % =========================================================================
 % Extract the codewords for all Songs:
@@ -108,3 +118,5 @@ save(cw_hist_allSongs_fileName,'norm_hist_codeWords_allSongs','-append');
 
 size(norm_hist_codeWords_allSongs)
 imagesc(norm_hist_codeWords_allSongs)
+
+%}

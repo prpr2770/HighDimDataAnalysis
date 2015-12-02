@@ -54,6 +54,7 @@ dyn_mfcc_allSongs = [];
 
 countSong = 0;
 
+%{
 for k=1:length(Files)
     if (Files(k).bytes >0 )
         countSong = countSong + 1
@@ -142,6 +143,9 @@ clear MFCC fd_mfcc sd_mfcc DYN_MFCC
 warning('cleared: mfcc_allSongs dyn_mfcc_allSongs MFCC fd_mfcc sd_mfcc DYN_MFCC')
 
 
+
+%}
+
 % ----------------------------------------------------
 % modify script to compute the mean, std_dev and the normalized vectors, directly
 % from the .mat file. without loading the whole data into memory.
@@ -152,10 +156,11 @@ warning('cleared: mfcc_allSongs dyn_mfcc_allSongs MFCC fd_mfcc sd_mfcc DYN_MFCC'
 % Computing mean
 warning('Computing Mean_mfcc');
 sumMean = zeros(nrows,1);
-% for i = 1:ncols
-%     sum = sum + mFile.dyn_mfcc_allSongs(:,i);
-% end
-sumMean = sum(mFile.dyn_mfcc_allSongs,2);
+for i = 1:ncols
+    i
+    sumMean = sumMean + mFile.dyn_mfcc_allSongs(:,i);
+end
+% % sumMean = sum(mFile.dyn_mfcc_allSongs,2);
 mean_dyn_mfcc = (1/ncols) * sumMean;
 size(mean_dyn_mfcc)
 
@@ -165,15 +170,15 @@ warning('Computing Std_mfcc');
 varSum = zeros(nrows,1);
 
 tic
-% computing via Matrix Based computations
-mean_dyn_mfcc_mat = repmat(mean_dyn_mfcc,1,ncols);
-varSum = sum((mFile.dyn_mfcc_allSongs - mean_dyn_mfcc_mat).^2,2);
+% % % computing via Matrix Based computations
+% % mean_dyn_mfcc_mat = repmat(mean_dyn_mfcc,1,ncols);
+% % varSum = sum((mFile.dyn_mfcc_allSongs - mean_dyn_mfcc_mat).^2,2);
 
-% iterative execution
-% for i = 1:ncols
-%     i
-%     varSum = varSum + (mFile.dyn_mfcc_allSongs(:,i) - mean_dyn_mfcc).^2;
-% end
+iterative execution
+for i = 1:ncols
+    i
+    varSum = varSum + (mFile.dyn_mfcc_allSongs(:,i) - mean_dyn_mfcc).^2;
+end
 
 std_dyn_mfcc = ((1/ncols) * varSum).^(0.5);
 toc
@@ -192,19 +197,19 @@ size(mFile.dyn_mfcc_allSongs)
 warning('Computing and storing Normalized Dyn_MFCC for ALL_FRAMES');
 tic
 
-% % for i = 1:ncols
-% %     i
-% %     if i>1
-% %         normDyn_mFile.norm_dyn_mfcc_allSongs(:,i) = (mFile.dyn_mfcc_allSongs(:,i) - mean_dyn_mfcc)./std_dyn_mfcc;
-% %     else
-% %         normDyn_mFile.norm_dyn_mfcc_allSongs = (mFile.dyn_mfcc_allSongs(:,i) - mean_dyn_mfcc)./std_dyn_mfcc;
-% %     end
-% % end
+for i = 1:ncols
+    i
+    if i>1
+        normDyn_mFile.norm_dyn_mfcc_allSongs(:,i) = (mFile.dyn_mfcc_allSongs(:,i) - mean_dyn_mfcc)./std_dyn_mfcc;
+    else
+        normDyn_mFile.norm_dyn_mfcc_allSongs = (mFile.dyn_mfcc_allSongs(:,i) - mean_dyn_mfcc)./std_dyn_mfcc;
+    end
+end
 
 % % % Computing it via Matrix-Computations, as an Entire Batch!
-mean_dyn_mfcc_mat = repmat(mean_dyn_mfcc,1,ncols);
-std_dyn_mfcc_mat = repmat(std_dyn_mfcc,1,ncols);
-normDyn_mFile.norm_dyn_mfcc_allSongs = (mFile.dyn_mfcc_allSongs - mean_dyn_mfcc_mat)./std_dyn_mfcc_mat;
+% % mean_dyn_mfcc_mat = repmat(mean_dyn_mfcc,1,ncols);
+% % std_dyn_mfcc_mat = repmat(std_dyn_mfcc,1,ncols);
+% % normDyn_mFile.norm_dyn_mfcc_allSongs = (mFile.dyn_mfcc_allSongs - mean_dyn_mfcc_mat)./std_dyn_mfcc_mat;
 
 toc
 
