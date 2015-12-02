@@ -29,6 +29,7 @@ data_allSongs = load(mfcc_allSongs_fileName);
 
 % create file: store norm_codeWordHistograms
 cw_hist_allSongs_fileName = strcat(aggregateDataDirName,'\cw_hist_allSongs.mat');
+cw_mFile = matfile(cw_hist_allSongs_fileName,'Writable',true);
 
 % extract the global paramter/data
 norm_dyn_mfcc_allSongs = data_allSongs.norm_dyn_mfcc_allSongs;
@@ -51,7 +52,7 @@ size(X)
 [C,Qe,N,W,Q] = ma_kmeans(X, iter, numCodeWords);
 codeWordCenters = C';           % COLVEC - Convert!
 
-save(cw_hist_allSongs_fileName,'codeWordCenters');
+cw_mFile.codeWordCenters = codeWordCenters; % save(cw_hist_allSongs_fileName,'codeWordCenters');
 
 % =========================================================================
 % Extract the codewords for all Songs:
@@ -61,7 +62,11 @@ save(cw_hist_allSongs_fileName,'codeWordCenters');
 Files=dir(tracksDirName);
 length(Files)
 
-norm_hist_codeWords_allSongs = zeros(numCodeWords,totalSongs);
+
+
+% norm_hist_codeWords_allSongs = zeros(numCodeWords,totalSongs);
+
+
 
 countSong =0;
 for k=1:length(Files)
@@ -74,9 +79,10 @@ for k=1:length(Files)
         wavName = wavfileName(1:end-4);     % remove .wav extension
         mfcc_song_fileName = strcat(matDataDirName,'\',wavName,'.mat');
         
-        song_data = load(mfcc_song_fileName);
-        dyn_mfcc_song  = song_data.DYN_MFCC;
+        mfcc_song_File = matfile(mfcc_song_fileName);
+        NORM_DYN_MFCC = mfcc_song_File.NORM_DYN_MFCC;
         
+        %{
         % --------------------------------------------
         % normalize the dyn_mfcc_song
         [numCoeffs numFrames] = size(dyn_mfcc_song);
@@ -85,26 +91,44 @@ for k=1:length(Files)
         std_dyn_mfcc_mat = repmat(std_dyn_mfcc,1,numFrames);
         
         norm_dyn_mfcc_song = (dyn_mfcc_song - mean_dyn_mfcc_mat)./std_dyn_mfcc_mat;
-        
+        % --------------------------------------------
+        %}
+
+
+        % --------------------------------------------
         % determine the tau-nearest-nbrs for each frame-in-song among
         % codeWordCenters.
         size(codeWordCenters)
-        size(norm_dyn_mfcc_song)
-        nbrs_of_songFrames = knnsearch(codeWordCenters',norm_dyn_mfcc_song','k',tau,'distance','euclidean');
+        size(NORM_DYN_MFCC)
+        nbrs_of_songFrames = knnsearch(codeWordCenters',NORM_DYN_MFCC','k',tau,'distance','euclidean');
         nbrs_of_songFrames = reshape(nbrs_of_songFrames,[],1);
         
-        % extract histogram of occurence
-        hist_vec = histc(nbrs_of_songFrames,1:length(codeWordCenters));
+        % extract histogram of occurence and re-structure into COL_VEC
+        hist_vec = histc(nbrs_of_songFrames,1:numCodeWords);
         hist_vec = reshape(hist_vec,[],1);
         
+        if countSong > 1
         % update the norm_hist_codeWords representation of each song.
-        norm_hist_codeWords_allSongs(:,countSong) = (1/numFrames) * (1/tau)* hist_vec;
+        % norm_hist_codeWords_allSongs(:,countSong) = (1/numFrames) * (1/tau)* hist_vec;
+
+        % save directly into file
+        cw_mFile.NORM_CW_HISTS(:,countSong) = (1/numFrames) * (1/tau)* hist_vec;
+    else
+        % save into matrix
+        % norm_hist_codeWords_allSongs(:,countSong) = (1/numFrames) * (1/tau)* hist_vec;
+
+        % save directly into file
+        cw_mFile.NORM_CW_HISTS = (1/numFrames) * (1/tau)* hist_vec;
+        end
+
+
+        % iteratively save the norm_hist_codeWord into the file.
         
     end % iterate over all songs
 end %iterate over all files
 
 % archive the normalized_codeWord_histogram_representation.
-save(cw_hist_allSongs_fileName,'norm_hist_codeWords_allSongs','-append');
+% save(cw_hist_allSongs_fileName,'norm_hist_codeWords_allSongs','-append');
 
-size(norm_hist_codeWords_allSongs)
-imagesc(norm_hist_codeWords_allSongs)
+size(cw_mFile.NORM_CW_HISTS)
+imagesc(cw_mFile.NORM_CW_HISTS)
