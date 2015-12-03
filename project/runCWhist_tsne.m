@@ -35,6 +35,8 @@ cwDistance_mFile = matfile(cwDistance_fileName);
 
 CW_HIST_DATA = cwHist_mFile.CODEWORD_HIST_ALLSONGS;
 
+CW_HIST_DATA = CW_HIST_DATA.^(0.5);
+
 size(CW_HIST_DATA)
 size(songGenres)
 
