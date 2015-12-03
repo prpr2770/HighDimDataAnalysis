@@ -41,7 +41,7 @@ aggData_mFile = matfile(aggData_allSongs_fileName,'Writable',true);
 TOTAL_FRAMES = aggData_mFile.TOTAL_FRAMES;
 TOTAL_SONGS = aggData_mFile.TOTAL_SONGS ;
 DIMS_DYN_MFCC = aggData_mFile.dims_DYN_MFCC ;
-DIMS_MFCC = aggData_mFile.dims_DYN_MFCC ;
+DIMS_MFCC = aggData_mFile.dims_MFCC ;
 
 % -------------------------------------------------------------------------------
 % Compute the MEAN_DYN_MFCC : song-wise

@@ -120,10 +120,12 @@ end % iterate over all Files
 % -------------------------------------------------------------------------
 % Computing Aggregate Information
 [dims_DYN_MFCC, frameSong] = size(DYN_MFCC);
-      
+[dims_MFCC, frameSong] = size(MFCC);
+
 aggData_mFile.TOTAL_FRAMES = totalFrames;
 aggData_mFile.TOTAL_SONGS = countSong;
 aggData_mFile.dims_DYN_MFCC = dims_DYN_MFCC;
+aggData_mFile.dims_MFCC = dims_MFCC;
 
 warning('dyn_mfcc : has been extracted and saved for every song in DB.');
 
