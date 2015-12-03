@@ -37,7 +37,7 @@ if (dataType == 'MFCC' || dataType == 'DYN_MFCC' || dataType == 'FD_DYN_MFCC')
     codewords_mFile = matfile(codewords_fileName);
     
     % matfile: storing 'CODEWORD_HIST_ALLSONGS'
-    cwHist_fileName = strcat(aggregateDataDirName,'\cw_histogram_mfcc_allSongs.mat');
+    cwHist_fileName = strcat(aggregateDataDirName,'\cw_histogram_allSongs.mat');
     cwHist_mFile = matfile(cwHist_fileName,'Writable',true);
     
     
@@ -64,15 +64,16 @@ if (dataType == 'MFCC' || dataType == 'DYN_MFCC' || dataType == 'FD_DYN_MFCC')
             
             
             % extract the data needed.
-            NORM_MFCC = mfcc_song_mFile.NORM_MFCC;
-            [coeffs songFrames] = size(NORM_MFCC);
+%             NORM_MFCC = mfcc_song_mFile.NORM_MFCC;
+            eval(['DATA = mfcc_song_mFile.','NORM_',dataType,';']);
+            [coeffs songFrames] = size(DATA);
             
             
             % find tau-nearest neighbors
             
             size(CODEWORDS_ALLSONGS)
-            size(NORM_MFCC)
-            nbrs_of_songFrames = knnsearch(CODEWORDS_ALLSONGS',NORM_MFCC','k',tau,'distance','euclidean');
+            size(DATA)
+            nbrs_of_songFrames = knnsearch(CODEWORDS_ALLSONGS',DATA','k',tau,'distance','euclidean');
             nbrs_of_songFrames = reshape(nbrs_of_songFrames,[],1);
             
             % extract histogram of occurence and re-structure into COL_VEC
