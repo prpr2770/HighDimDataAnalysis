@@ -117,7 +117,7 @@ end
 std_mfcc = ((1/totalFrames) * varSum).^(0.5);
 size(std_mfcc)
 
-STD_MFCC = std_dyn_mfcc;
+STD_MFCC = std_mfcc;
 
 
 aggData_mFile.STD_MFCC = STD_MFCC;
@@ -155,22 +155,11 @@ for k=1:length(Files)       % sequentially analyze dyn_mfcc_data song-wise
         % -------------------------------------------------------
         % compute the NORM-DYN-MFCC
         mean_mfcc_mat = repmat(mean_mfcc,1,songFrames);
-        std_mfcc_mat = repmat(std_dyn_mfcc,1,songFrames);
+        std_mfcc_mat = repmat(std_mfcc,1,songFrames);
         NORM_MFCC = (MFCC - mean_mfcc_mat)./std_mfcc_mat;
 
         % store the NORM_DYN_MFCC
         mfcc_song_mFile.NORM_MFCC = NORM_MFCC;
-
-        % -------------------------------------------------------
-        % archive the norm_dyn_mfcc_ofAllSongs!
-        if countSong > 1
-            [nrows ncols] = size(nrm_dyn_mfcc_allSongs_mFile,'NRM_MFCC_ALLSONGS');
-            numFrames = size(NORM_MFCC,2);
-            nrm_dyn_mfcc_allSongs_mFile.NRM_MFCC_ALLSONGS(:,ncols+1:ncols+numFrames) = NORM_MFCC;
-        else
-            nrm_dyn_mfcc_allSongs_mFile.NRM_MFCC_ALLSONGS = NORM_MFCC;
-        end
-
         % -------------------------------------------------------
         % clear up memory
         clear mean_mfcc_mat std_mfcc_mat NORM_MFCC MFCC ;

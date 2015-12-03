@@ -81,7 +81,7 @@ for k=1:length(Files)       % sequentially analyze dyn_mfcc_data song-wise
             cwHist_mFile.CODEWORD_HIST_ALLSONGS = (1/songFrames) * (1/tau)* hist_vec;
         end
         
-        
+        clear hist_vec NORM_MFCC;
         
     end
 end
