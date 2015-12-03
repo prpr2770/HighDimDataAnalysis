@@ -1,34 +1,29 @@
 %{
 Script to do the following:
-1. Read all the songs and extract all their mfcc information. Also, obtain
-vector representing genreIDs of songs.
-1.a) compute the dynamic_mfcc: first and second derivatives
-2. Normalize the dyn_mfcc vectors per dimension
-3. Store/archive mfcc and dyn_mfcc for all songs!
-
-5. Extract the code-words from this bag-of-frames. ( k-means: 128,256, 512,...)
-6. Save the code-word identifiers
-
-7. Obtain code-word-histogram for each song.  (top-tau vector
-quantization).
-8. Store the code-word-histogram Identifiers of each song.
+Read all the songs in tracks.
+Extract MFCC, FD_MFCC, DYN_MFCC information.
+Store all these into file for a single-song.
 %}
 
 % =========================================================================
-clear all; close all; clc;
+% clear all; close all; clc;
 
-tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
+
+function extract_songwise_data(tracksDirName)
+
+% tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
+
 [genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
 
 
 
 
 % data directory to store mfcc and dyn_mfcc of each song
-matDataDirName = fullfile(tracksDirName,'dynMfcc_data')
+matDataDirName = fullfile(tracksDirName,'song_data')
 status = mkdir(matDataDirName)
 
 % data directory to store mfcc and dyn_mfcc of all song
-aggregateDataDirName = fullfile(tracksDirName,'dynMfcc_data_aggregate')
+aggregateDataDirName = fullfile(tracksDirName,'aggregate_song_data')
 status = mkdir(aggregateDataDirName)
 
 
