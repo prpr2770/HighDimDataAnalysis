@@ -1,11 +1,21 @@
 %{
-Experiment: CodeWord Histograms
+Experiments: CodeWord Histograms
 %}
 clear all; close all; clc;
 
 % -------------------------------------------------------------------------------
-% FOLDER
+% Parameters
+
 tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
+
+totalIter = 20;              % totalIterations for Training-Test crossValids.
+generate_ITML_DistanceMatrix = 0;   % Set 1: To RUN!
+
+dataType = 'MFCC';
+EXPERIMENT_TYPE = 'Original_Data'; % 'tSNE' 'Graph' 'ITML_Graph' 'ITML_tSNE'
+
+% -------------------------------------------------------------------------------
+% FOLDER
 
 % data directory to store mfcc and dyn_mfcc of each song
 matDataDirName = fullfile(tracksDirName,'song_data')
@@ -20,24 +30,22 @@ aggregateDataDirName = fullfile(tracksDirName,'aggregate_song_data')
 aggData_allSongs_fileName = strcat(aggregateDataDirName,'\aggData_allSongs.mat');
 aggData_mFile = matfile(aggData_allSongs_fileName,'Writable',true);
 
-% =========================================================================
 % -------------------------------------------------------------------------
-% Iterations for running all experiments:
 
-totalIter = 1;
-[genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
-
-dataType = 'MFCC';
-generate_ITML_DistanceMatrix = 0;   % Set 1: To RUN!
-
-% -------------------------------------------------------------------------
 % matfile: storing 'CODEWORD_HIST_ALLSONGS'
 cwHist_fileName = strcat(aggregateDataDirName,'\',dataType,'\cw_histogram_allSongs.mat');
 cwHist_mFile = matfile(cwHist_fileName,'Writable',true);
-dataSet = cwHist_mFile.CODEWORD_HIST_ALLSONGS';     % ROW-VECT DATASETS
 
 distMatrix_fileName = strcat(aggregateDataDirName,'\',dataType,'itml_distance_matrix.mat');
 distMatrix_mat = matfile(distMatrix_fileName, 'Writable', true);
+
+% -------------------------------------------------------------------------
+% Obtain HighDimensional Dataset - Codeword Histogram
+
+dataSet = cwHist_mFile.CODEWORD_HIST_ALLSONGS';     % ROW-VECT DATASETS
+
+% obtain GenreIDs from TRUTH file.
+[genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
 
 % -------------------------------------------------------------------------
 if generate_ITML_DistanceMatrix
@@ -54,10 +62,10 @@ if generate_ITML_DistanceMatrix
     distMatrix_mat.DIST_METRIC = dist_metric;
     distMatrix_mat.DIST_MATRIX = dist_matrix;
 end
+
+% =========================================================================
+%% Experiments:
 % -------------------------------------------------------------------------
-
-
-EXPERIMENT_TYPE = 'Original_Data'; % 'tSNE' 'Graph' 'ITML_Graph' 'ITML_tSNE'
 
 switch experimentType
     
@@ -74,6 +82,9 @@ switch experimentType
         PLOT_TITLE = sprintf('tSNE Embedding of CodeWords-%s',dataType);
         
     case 'Graph'
+        dimReducedSpace = 3;
+        DATA = getRefinedGraphEmbedding(dataSet, dimReducedSpace);
+        PLOT_TITLE = sprintf('Refined Graph Embedding of CodeWords-%s',dataType);
         
     case 'ITML_tSNE'
         % read ITML_distance_matrix
@@ -95,7 +106,7 @@ switch experimentType
         
         PLOT_TITLE = sprintf('ITML + Graph Embedding of CodeWords-%s',dataType);
 end
-%% Implement Clusterin
+%% Implement Clustering
 % -------------------------------------------------------------------------
 
 [mean_ConfusionMatrix, stdDev_ConfusionMatrix] =  run_experiment_train_test_BAM(tracksDirName, DATA, totalIter)

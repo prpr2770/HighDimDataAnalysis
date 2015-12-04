@@ -223,7 +223,7 @@ Distance_Matrix = D + D';
 % Save the computed Distance Matrix
 
 distMatrix_mat = 'itml_distance_matrix.mat';
-distMatrix_mat = strcat(methodOfX,distMatrix_mat);
+distMatrix_mat = strcat(,distMatrix_mat);
 
 % opening the .mat file
 matfile_distMatrix = fullfile(g1c_SongFeatures_Dir, distMatrix_mat);
