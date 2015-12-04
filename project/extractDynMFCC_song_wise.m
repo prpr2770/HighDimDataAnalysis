@@ -24,11 +24,11 @@ tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
 
 
 % data directory to store mfcc and dyn_mfcc of each song
-matDataDirName = fullfile(tracksDirName,'dynMfcc_data')
+matDataDirName = fullfile(tracksDirName,'song_data')
 status = mkdir(matDataDirName)
 
 % data directory to store mfcc and dyn_mfcc of all song
-aggregateDataDirName = fullfile(tracksDirName,'dynMfcc_data_aggregate')
+aggregateDataDirName = fullfile(tracksDirName,'aggregate_song_data')
 status = mkdir(aggregateDataDirName)
 
 
