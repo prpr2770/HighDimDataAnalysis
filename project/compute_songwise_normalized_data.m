@@ -15,7 +15,9 @@ b) STD_[]
 % clear all; close all; clc;
 % tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
 
-function compute_songwise_normalized_data(tracksDirName)
+% function compute_songwise_normalized_data(tracksDirName)
+
+
 [genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
 
 % data directory to store mfcc and dyn_mfcc of each song
@@ -126,7 +128,7 @@ for k=1:length(Files)       % sequentially analyze dyn_mfcc_data song-wise
         [coeffs songFrames] = size(MFCC);
         
         MEAN_MFCC_mat = repmat(MEAN_MFCC,1,songFrames);
-        varSum_MFCC = sum((MFCC - MEAN_MFCC).^2,2);  %rowsum
+        varSum_MFCC = sum((MFCC - MEAN_MFCC_mat).^2,2);  %rowsum
 
         % ----------------------------------------------------
         % extract the data needed.
@@ -134,7 +136,7 @@ for k=1:length(Files)       % sequentially analyze dyn_mfcc_data song-wise
         [coeffs songFrames] = size(DYN_MFCC);
         
         MEAN_DYN_MFCC_mat = repmat(MEAN_DYN_MFCC,1,songFrames);
-        varSum_DYN_MFCC = sum((DYN_MFCC - MEAN_DYN_MFCC).^2,2);  %rowsum
+        varSum_DYN_MFCC = sum((DYN_MFCC - MEAN_DYN_MFCC_mat).^2,2);  %rowsum
                 
         % ----------------------------------------------------
         % extract the data needed.
@@ -142,7 +144,7 @@ for k=1:length(Files)       % sequentially analyze dyn_mfcc_data song-wise
         [coeffs songFrames] = size(FD_DYN_MFCC);
 
         MEAN_FD_DYN_MFCC_mat = repmat(MEAN_FD_DYN_MFCC,1,songFrames);
-        varSum_FD_DYN_MFCC = sum((FD_DYN_MFCC - MEAN_FD_DYN_MFCC).^2,2);  %rowsum
+        varSum_FD_DYN_MFCC = sum((FD_DYN_MFCC - MEAN_FD_DYN_MFCC_mat).^2,2);  %rowsum
 
         % ----------------------------------------------------
         
@@ -242,4 +244,4 @@ end
        
 toc
 
-end
+% end

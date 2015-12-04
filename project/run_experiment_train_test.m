@@ -1,69 +1,49 @@
 %{
-29 Novemeber!
+Scripts to do the following:
++ Read the emebeddedDataPoints as Row-Vectors
++ Determine number of iterations over which Clustering should be
+implemented.
++ Partition into TRAIN-TEST datasets. 
++ Compute the confusionMatrix for each iteration.
++ Determine the Mean and StdDev of ConfusionMatrices.
 
-Partition the dataset first into Training and Test Datasets. 
-Generate the GraphEmbedding only on the Training set.
-After that perform the clustering upon the Training set. 
-Then, include the training set, and determine the confusion matrix for
-these. 
-
-1. Create 80% Training and 20% Test Data. 
-2. Implement the graph embedding on the Training Data.
-3. Determine Belonging for the 20% Test Data. 
-4. Compute and Plot the Confusion Matrix. 
-
-NOTE: 
-Training data is embedded separately, from the Test Data.
-But, the Membership is determined by finding neighobrs of the Test_data
-from amongst the Train_data.
-
-% -------------------------------------------------------------------
-27 Novemeber
-Script that does the following:
-
-1. Read DistanceMatrix from folder. 
-2. Perform RefinedGraph Embedding
-3. Plot 3D vectors.
-
-
-Part 2:
-1. Determine clusters between the points
-2. Identify the indexes of points in each cluster
-3. Determine true Genre Classfication of songs, and compare with the
-Clusters they belong to. 
-4. What sort of plots are you doing?
-
+Plots:
+1. Imagesc of the Mean and Covariance ConfusionMatrix for the Test-Data
+(Voting of the ClusterMemebership of TestData by the TrainingData.)
 
 %}
 
-clear all;close all; clc
-% dir containing tracks
-tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\'
-% dir with song features
-g1c_SongFeatures_Dir = fullfile(tracksDirName ,'g1c_SongFeatures\')
-
-% distance matrix files
-distMatrix_txt = 'distance_matrix.txt';
-distMatrix_mat = 'distance_matrix.mat';
-
-% -------------------------------------------------------------------
-% reading the distMatrix.mat file
-matfile_distMatrix = fullfile(g1c_SongFeatures_Dir, distMatrix_mat);
-distance_matrix = load(matfile_distMatrix);
-
-mutualDistance = distance_matrix.D;
 
 % ========================================================================
 % Determine the Training and Test Data: 
 
-[genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
+function [mean_ConfusionMatrix, stdDev_ConfusionMatrix] =  run_experiment_train_test(tracksDirName, dataSet, totalIter)
+%{
+Input: 
+tracksDirName:  Directory containing tracks
+dataSet:        Coordinates of songs as row-vectors, in the Embedded Space.
+totalIter:      Number of iterations of random training and test/data to be
+created.
+
+Output:
+mean_ConfusionMatrix:      mean ConfusionMatrix for the Genres
+stdDev_ConfusionMatrix:     stddev of ConfusionMatrix for the Genres
+%}
+
+% Parameters for the code to run.
+% totalIter = 30;
+% tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
+
+% -------------------------------------------------------------------
 % Iterate the following section, to compute the ConfusionMatrix for given
 % Pipeline. 
 
-totalIter = 30;
+[genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
+
 allConfusionMatrices = zeros(length(genreKeys),length(genreKeys),totalIter);
 
 for iter = 1:totalIter
+    iter
     % -------------------------------------------------------------------
     % Create a dictionary of indices for each genreType.
     
@@ -71,7 +51,9 @@ for iter = 1:totalIter
     trainData_genreID = [];
     testData_Indices = [];
     testData_genreID = [];
+
     
+    % for each genre, identify 80% as Training, 20% as Test.
     for genreIndx = 1:length(genreKeys)
         songsOfAGenre = find(songGenres == genreIndx); % indices of all songs belonging to
         
@@ -114,12 +96,101 @@ for iter = 1:totalIter
         end
     end
     
-%     trainData_dict.keys()
-%     trainData_dict.values()
+    %     trainData_dict.keys()
+    %     trainData_dict.values()
     
     % Determine Size of Training and Testing Datasets!
-%     size(trainData_Indices)
-%     size(testData_Indices)
+    %     size(trainData_Indices)
+    %     size(testData_Indices)
+    % =========================================================================
+    % Extract the Training and Testing Datasets from the givenDataset
+    
+    embeddedPoints_train = dataSet(trainData_Indices,:);
+    trainData_genreID;
+    
+    embeddedPoints_test = dataSet(testData_Indices,:);
+    testData_genreID;
+    
+    
+    % ========================================================================
+    % Determine Cluster Memebership for each of the test-songs
+    
+    % clusterMembership_Test
+    testData_genreID_pred = [];
+    for testsample = 1:length(testData_Indices)
+        % pointwise determine the cluterMembership for each testSong.
+        % Reads the PROB-VECTOR of ClusetrMembership, takes the
+        % MaximumValue-Membership as its GenreID_Predicted.
+        sampleCoord = embeddedPoints_test(testsample,:);
+        sampleCoord_genreID_true = testData_genreID(testsample);
+        clusterMembershipProb = getClusterMembership(sampleCoord,embeddedPoints_train,trainData_genreID);
+        [M, sampleCoord_genreID_pred] = max(clusterMembershipProb);
+        testData_genreID_pred(testsample) = sampleCoord_genreID_pred;
+    end
+    
+    % determine total number of Genres
+    totalGenres = length(genreKeys);
+    
+    % intialize ConfusionMatrix for given iteration
+    confusionMatrix = zeros(totalGenres,totalGenres);
+    
+    for genreID = 1:totalGenres
+        % identify indices of songs belonging to a genre, 
+        % within TRUTH-DATSET of the Training Dataset.
+        SongsIndxOfGivenGenre = (testData_genreID == genreID);
+        totalSongsOfGenre = sum(SongsIndxOfGivenGenre);
+        
+        % Determine PREDICTION-ACCURACY for songs WITHIN GENRES.
+        % search within given subset of test_songs:
+        Pred_SongsIndxOfGivenGenre = testData_genreID_pred.*SongsIndxOfGivenGenre;
+        
+        for j=1:totalGenres
+            % total Songs estimated to belong to particular genre
+            numSongsEstAsGivenGenre = sum(Pred_SongsIndxOfGivenGenre == j);
+            confusionMatrix(genreID,j) = numSongsEstAsGivenGenre/totalSongsOfGenre;
+        end
+    end
+    
+    allConfusionMatrices(:,:,iter) = confusionMatrix;
+end
+
+% Computing Mean and Std-Dev of the Confusion Matrices
+mean_ConfusionMatrix = 1/totalIter * sum(allConfusionMatrices,3)
+
+% Computing the STD-DEV ConfusionMatrix
+mean_ConfusionMatrix_REPMAT = repmat(mean_ConfusionMatrix,1,1,totalIter);
+var_ConfusionMatrix = 1/totalIter * sum((allConfusionMatrices - mean_ConfusionMatrix_REPMAT).^2,3);
+
+stdDev_ConfusionMatrix = var_ConfusionMatrix.^(0.5);
+
+%{
+% Compute STD_DEV iteratively.
+diffSum = zeros(size(mean_ConfusionMatrix));
+for i = 1: totalIter
+    diffSum = diffSum + (allConfusionMatrices(:,:,i) - mean_ConfusionMatrix).^2;
+end
+stdDev_ConfusionMatrix = (1/totalIter*diffSum).^(1/2)
+%}
+
+
+fig1 = figure(1)
+colormap parula
+subplot(2,1,1)
+imagesc(mean_ConfusionMatrix);
+title('MEAN Confusion Matrix')
+colorbar
+
+subplot(2,1,2)
+imagesc(stdDev_ConfusionMatrix);
+title('STD-DEV Confusion Matrix')
+colorbar
+
+end
+
+
+%{
+
+% ========================================================================
     % -------------------------------------------------------------------
     % Extract Distance Matrix for the Training and Testing Data
     
@@ -185,47 +256,7 @@ for iter = 1:totalIter
     legend(genreKeys)
     hold off
     % ---------------------------------------------------
-    
-    % ========================================================================
-    % Determine Cluster Memebership for each of the test-songs
-    
-    % clusterMembership_Test
-    testData_genreID_est = [];
-    for testsample = 1:length(testData_Indices)
-        sampleCoord = embeddedPoints_test(testsample,:);
-        sampleCoord_genreID_true = testData_genreID(testsample);
-        clusterMembershipProb = getClusterMembership(sampleCoord,embeddedPoints_train,trainData_genreID);
-        [M, sampleCoord_genreID_est] = max(clusterMembershipProb);
-        testData_genreID_est(testsample) = sampleCoord_genreID_est;
-    end
-    
-    totalGenres = length(genreKeys);
-    confusionMatrix = zeros(totalGenres,totalGenres);
-    
-    for genreID = 1:totalGenres
-        % identify indices of songs belonging to a genre
-        SongsIndxOfGivenGenre = (testData_genreID == genreID);
-        totalSongsOfGenre = sum(SongsIndxOfGivenGenre);
-        
-        %search within given subset of test_songs
-        Est_SongsIndxOfGivenGenre = testData_genreID_est.*SongsIndxOfGivenGenre;
-        
-        for j=1:totalGenres
-            % total Songs estimated to belong to particular genre
-            numSongsEstAsGivenGenre = sum(Est_SongsIndxOfGivenGenre == j);
-            confusionMatrix(genreID,j) = numSongsEstAsGivenGenre/totalSongsOfGenre;
-        end
-    end
-    
-    allConfusionMatrices(:,:,iter) = confusionMatrix;
-end
 
-% Computing Mean and Std-Dev of the Confusion Matrices
-mean_ConfusionMatrix = 1/totalIter * sum(allConfusionMatrices,3)
+% =========================================================================
 
-diffSum = zeros(size(mean_ConfusionMatrix));
-for i = 1: totalIter
-    diffSum = diffSum + (allConfusionMatrices(:,:,i) - mean_ConfusionMatrix).^2;
-end
-
-stdDev_ConfusionMatrix = (1/totalIter*diffSum).^(1/2)
+%}

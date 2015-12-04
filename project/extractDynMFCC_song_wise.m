@@ -15,7 +15,7 @@ quantization).
 %}
 
 % =========================================================================
-clear all; close all; clc;
+% clear all; close all; clc;
 
 tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
 [genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
