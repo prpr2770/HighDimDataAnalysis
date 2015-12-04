@@ -8,7 +8,7 @@ Script that does the following:
 %}
 
 
-function extract_codewords_forallsongs(numCodeWords, iter)
+function extract_codewords_forallsongs(tracksDirName, numCodeWords, iter)
 
 % numCodeWords = 256;
 % iter = 100;

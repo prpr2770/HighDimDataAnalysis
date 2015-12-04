@@ -57,12 +57,12 @@ extract_codewords_batchwise(tracksDirName, numCodeWordsPerBatch,songsPerBatch,it
 % Extract CodeWords for all the Batches-together. || ALLSONGS-CODEWORDS
 numCodeWords = 512; tau = 10;iter = 50;
 % extract_MFCC_CodeWords_AllSongs(numCodeWords, iter, dataType)
-extract_codewords_forallsongs(numCodeWords, iter)
+extract_codewords_forallsongs(tracksDirName,numCodeWords, iter)
 
 
 % -----------------------------------------------------------------------
 % Compute CODEWORD-HIST for each song.
-extract_codehistogram_allSongs( numCodeWords, tau, dataType);
+extract_codeword_histogram_allSongs(tracksDirName, numCodeWords, tau, dataType);
 
 % =========================================================================
 

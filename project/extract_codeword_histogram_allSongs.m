@@ -7,12 +7,12 @@ Script that does the following:
 %}
 
 
-function extract_codeword_histogram_allSongs( numCodeWords, tau, dataType)
+function extract_codeword_histogram_allSongs(tracksDirName, numCodeWords, tau, dataType)
 % =========================================================================
 % numCodeWords = 256;
 % tau = 10;
 
-if (dataType == 'MFCC' || dataType == 'DYN_MFCC' || dataType == 'FD_DYN_MFCC')
+if (strcmp(dataType,'MFCC') || strcmp(dataType,'DYN_MFCC') || strcmp(dataType,'FD_DYN_MFCC'))
     
     
     % tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';

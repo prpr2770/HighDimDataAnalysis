@@ -14,7 +14,7 @@ function extract_codewords_batchwise(tracksDirName, numCodeWordsPerBatch,songsPe
 
 % =========================================================================
 
-if (dataType == 'MFCC' || dataType == 'DYN_MFCC' || dataType == 'FD_DYN_MFCC')
+if ( strcmp(dataType,'MFCC') || strcmp(dataType,'DYN_MFCC') || strcmp(dataType,'FD_DYN_MFCC'))
     
     % tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
     [genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
@@ -84,7 +84,7 @@ if (dataType == 'MFCC' || dataType == 'DYN_MFCC' || dataType == 'FD_DYN_MFCC')
                 %             NORM_MFCC = mfcc_song_mFile.NORM_MFCC;
                 
                 % concatanate the frames for the 10 songs
-                eval(['BATCH_DATA = [BATCH_DATA ', 'NORM_',dataType,'];']);
+                BATCH_DATA = [BATCH_DATA DATA];
                 
             end
             % increment fileCount

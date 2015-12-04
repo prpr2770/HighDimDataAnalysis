@@ -79,7 +79,7 @@ for k=1:length(Files)       % sequentially analyze dyn_mfcc_data song-wise
                 
         % ----------------------------------------------------
         % extract the data needed.
-        FD_DYN_MFCC = mfcc_song_mFile.DYN_MFCC;
+        FD_DYN_MFCC = mfcc_song_mFile.FD_DYN_MFCC;
         [coeffs songFrames] = size(FD_DYN_MFCC);
         sumMean_FD_DYN_MFCC = sum(FD_DYN_MFCC,2);  %rowsum
         
