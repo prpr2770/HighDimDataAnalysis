@@ -8,20 +8,21 @@
 \topmargin -20mm
 \begin{document}                                       
 %_________________________________________________________________
-\title{The Project Proposal}
+\title{Opening up Pandora('s box)}
 \author{Brian Magee and Prasanth Prahladan}
 \maketitle
 
 %_________________________________________________________________
 \section{Introduction}
-%_________________________________________________________________
-In the "music-genre classification" problem, we are required to determine the genre of a given query song, based on 
-an algorithm that builds an internal representation of different music-genres, using a fixed database of classified(tagged) songs. The purpose of the project, is to enable the student to understand how to build a rudimentary functional prototype of a music-classification system. As a design challenge, the students are required to understand the high-level process of mining for patterns in a given music database,to split the process-flow into different sub-systems(algorithms) and determine how these functional-blocks may be combined to determine a process-flow for improving the efficiency of the classification problem. The specifications of the course-project as described in the project-guide, indicates the genres we need to focus on, and the number of songs assigned to each genre. 
+
+Audio/Music hosting applications like Pandora, Spotify, SoundCloud, Saavn etc, have the immense responsibility of being expected to serve as search-engines within the audio/sound-space. As a user, one expects that one's "taste" in music, is "understood"(learned) by the application, and that it shall then help the user explore and listen to artistes, tracks and albums, that would otherwise be difficult for the user, to individually search out for herself. The greater the search and exploratory experience, the better is the chance of the application being the favoured source of music-entertainment for its human-user-base.
+
+Given this context, the course project helps give us a hands-on experience with building up a "music-genre classification engine". In the "music-genre classification" problem, we are required to determine the genre of a given query song, based on an algorithm that builds an internal representation of different music-genres, using a fixed database of classified(tagged) songs. The purpose of the project, is to enable the student to understand how to build a rudimentary functional prototype of a music-classification system. As a design challenge, the students are required to understand the high-level process of mining for patterns in a given music database,to split the process-flow into different sub-systems(algorithms) and determine how these functional-blocks may be combined to determine a process-flow for improving the efficiency of the classification problem. The specifications of the course-project as described in the project-guide, indicates the genres we need to focus on and the number of songs assigned to each genre. 
 
 The music-genre classification process can be summarized by a five-stage pipeline. 
 \begin{enumerate}
-\item Embedding of Dataset into Euclidean Space:\\
-It is important to note that the representation of data-files in memory, needs to be chosen based on the application for which that data shall be utilized. A given song when represented/stored as a .mp3 or .wav file, may be processed and played using an Audio player. However, for the purpose of classification, we need to design/develop a particular vector-representation that incorporates certain "descriptive features" of the audio file. These "features" may be based on analytical notions of time-frequency domain representation or based on "perceptive/cognitive" notions. The representation of these features, as mathematical vectors embedded in a high-dimensional space, then permits us to use algorithms for processing vectorial data, for the purpose of automated classification/clustering. We intend to use the "mel-frequency cepstral coefficients", its derivatives and possibly discrete-cosine-transform coefficients as the required features representative of the songs. 
+\item Embedding of Dataset into a Metric Space:\\
+It is important to note that the representation of data-files in memory, needs to be chosen based on the application for which that data shall be utilized. A given song when represented/stored as a .mp3 or .wav file, may be processed and played using an Audio player. However, for the purpose of classification, we need to design/develop a particular vector-representation that incorporates certain "descriptive features" of the audio file. These "features" may be based on analytical notions of time-frequency domain representation or based on "perceptive/cognitive" notions. The representation of these features, as mathematical vectors embedded in a high-dimensional space, then permits us to use algorithms for processing vectorial data, for the purpose of automated classification/clustering. We intend to use the "mel-frequency cepstral coefficients", its derivatives and possibly other "high-level-feature" information for each of the song files. 
 
 \item Visual Pattern Detection of Music Database: \\
 The preliminary step involves the use of a Data-visualization library, to determine whether there are any patterns like clusters in the data, which can then be exploited. It would be helpful to understand the logic/ideas behind the algorithms used to guide the visualization process, which could then be incorporated into the classification engine, that we need to develop. 
@@ -30,7 +31,7 @@ The preliminary step involves the use of a Data-visualization library, to determ
 If any patterns(clusters) have been detected in the data-visualization, it helps to assume that the different genres of high-dimensional data in fact is distributed along low-dimensional manifolds embedded within the high-dimensional space. We can then use algorithms for determining the intrinsic dimension of these manifolds (e.g "Correlation Dimension" ). By determining the intrinsic-dimension of each of the genres, we can determine the minimum dimension of the space into which all the data can be embedded without losing much information. 
 
 \item Metric Learning:\\
-Ideally, when data are categorized into categories, we would like to believe that the songs/data-points that are "similar" to each other are "closer" to each other, and those that are "dissimilar" are "farther" apart. The closeness of two data-points is determined by the "distance metric" used to compute the distance between the two points. The reason such a "metric" would exist, can be deduced from the fact that the data points are distributed upon a Manifold. The measure of distance between any two points, thus becomes the distance travelled along the manifold surface between the points, rather than the shortest euclidean straight-line distance between them. The "metric-learning" problem deals with the problem of ascertaining the metric for each of the manifolds separately, or the notion of a "global-metric" for all the datapoints
+Ideally, when data are categorized into categories, we would like to believe that the songs/data-points that are "similar" to each other are "closer" to each other, and those that are "dissimilar" are "farther" apart. The closeness of two data-points is determined by the "distance metric" used to compute the distance between the two points. The reason such a "metric" would exist, can be deduced from the fact that the data points are distributed upon a Manifold. The measure of distance between any two points, thus becomes the distance travelled along the manifold surface between the points, rather than the shortest euclidean straight-line distance between them. The "metric-learning" problem deals with the problem of ascertaining the metric for each of the manifolds separately, or the notion of a "global-metric" for all the data-points.
 
 \item Dimension Reduction:\\
 Once the minimal intrinsic dimension of the datasets has been determined, and we have a notion of "distance-metric" that helps compute the distances between the points, we then deal with the problem of reducing the dimension of the data. We note that this procedure, helps us determine how much of the information from the initial choice of vector representation of the dataset is redundant. The solution to this problem, is the design of a Map/function that projects every data-point from the high-dimensional space to the low-dimensional space. To ensure that the representation for each data-point is unique in the reduced dimension, we impose the constraint of an injective mapping, on this function. 
@@ -48,11 +49,58 @@ This forms the final stage of the Genre-Detection problem. Once the abstract mod
 %_________________________________________________________________
 \section{Feature vector representation}
 
+To derive content-based features representative of songs, we would have to implement digitial signal-processing algorithms upon the .wav song files, to compute quantitative information about the song. Some of the features that can be extracted from a song are mfcc, fluctuation patters, etc. 
+
+<Explain the different possible features, in particular mfcc>. 
+
+In this project, we focus on using the Spectral Information of the songs, to serve as the signature of each song. Songs are then classified into genre based on the similarity between these signatures. 
+
 \subsection{Single Gaussian Model of each song}
 
+By adopting a Single-Gaussian Model representation of a song, one assumes that d-dimensional mfcc-coefficient vectors representative of each of the innumerable frames extracted from a song, can be obtained by sampling a multi-variate Gaussian in the d-dimensional song-mfcc-space. Thus, each song is represented by a Gaussian, with a mean-mfcc-coefficient vector and a covariance-mfcc-coefficient matrix that is obtained from the mfcc-coefficient vector representations of the frames extracted from the song. 
+
+Given, this representation of the song, the feature-vector used for computational purposes, could either assume the songs to be objects between which the distances are measured, by specialized mathematical schemes like KL-divergence, Earth-Movers-Distance, etc which are methods for computing distances between any two distributions. Or, as we have implemented, a custom-feature vector can be derived by concatenating the mean-mfcc vector($[1xd$] dimensions) and the upper-triangular part of the mfcc-covariance-matrix, to form an extended feature-vector ($[1x (d + d(d+1)/2)]$ dimensions).
+
 \subsection{Code-word Histogram}
+The code-word histogram \cite{codewordHist} approach to feature-vector representation of a song can be described intuitively as follows. All the music files in the database can be assumed to be 'sentences' that are made up of a fixed number of 'code-words' in the vocabulary of music. Each song is represented by the number of times specific 'code-words' occur in it. The word histogram is used to describe this method of counting the number of times a given code-word occurs in the song. Thus, by assuming such a finite word vocabulary to describe all possible songs in the database, we enable a  mechanism of drawing parallels between comparison of textual-documents via Natural-Language processing algorithms, and the analysis of music. 
+
+Mathematically, the code-word histogram generation process can be described as follows. To obtain a compact summary of audio signals each song is represented as a histogram over a dictionary of timbral codewords. As a first step, a codebook is constructed by clustering a large collection of feature-descriptors. Once the codebook has been constructed, each song is summarized by aggregating vector-quantization representations across all frames in the song, resulting in codeword histograms. Finally, histograms are represented in a nonlinear kernel space to facilitate better learning of the distance metric between the songs. 
+
+\subsubsection{Codebook training}
+The primary audio feature descriptor used for training of the codebook, is the mfcc coefficients of frames of a song. The audio-feature descriptors of all the songs in the database is aggregated into a single bag-of-features, which is then clustered to produce the codebook. In our implementation, the number of words in the codeword dictionary is arbitrarily chosen to be about 512. 
+
+For each song $x$ in the codebook training set $X_C$, we compute the 13 MelFrequency cepstral coefficients(mfcc) from each overlapping 25-ms frame. From the time-series of the MFCC vectors we compute the first and second instantaneous derivatives, which are concatanated to form a sequence of 13x2 dimensional first-order Dynamic-MFCC( FD_DYN_MFCC ) and 13x3 dimensional Dynamic-MFCC(DYN_MFCC). These descriptors are then aggregated across all $x \in X_C$ to form an unordered bag of features $Z$, where each $z \in Z \subset \R^D$ is either an MFCC, FD_DYN_MFCC or DYN_MFCC feature-vector representation of the song-frames.
+
+To correct for changes in scale across different dimensions of $z \in Z$, each vector is normalized according to the sample mean $\mu \in \R^D$ and standard deviation $\sigma \in \R^D$ estimated from $Z$. The i'th coordinte is mapped by
+\begin{align}
+z[i] \mapsto \frac{z[i] - \mu[i]}{\sigma[i]}. \label{eq:NormlizeMFCC}
+\end{align}The normalized feature vectors are then clustered into a set $\mathcal{V}$ of $|V| = 512$ codewords by k-means algorithm.
+
+\subsubsection{(Top \tau) Vector Quantization}
+Once the codebook $\mathcal{V}$ has been constructed, a song $x \in X_C$, is represented as a histogram $h_x$ over the codewords in the codebook. Each song $x \in X_C$ is understood to be a time-sequence of feature-vectors, $z = {z_i} \in Z \subset \R^D$ where $z_i$ is the feature-vector representation of a frame in the song. Each $z_i \in z$ is normalized according to \eqref{eq:NormlizeMFCC}. The codeword histogram of song $x \in X_C$ is constructed by counting the frequency with which each codeword $v \in \mathcal{V}$ quantizes the elements of $z$ i.e
+\begin{align}
+h_x[v] = \frac{1}{|z|} \sum_{z_i \in z} \frac{1}{\tau}\i\bigg\left[v = \argmin_{u \in \mathcal{V}}^{\tau}||z_i - u|| \bigg\right] \label{eq:wc_Hist_Defn}
+\end{align}
+where we have chosen to adopt multiple codeword quantizers of each vector $z_i$ by defining the quantization set
+\begin{align}
+\argmin_{u \in \mathcal{V}}^{\tau} = {u \text{ is a } \tau \text{nearest neighbor of }z_i}. \label{eq:TauQuantize}
+\end{align}
+where $\tau \in {1,2,\cdots, |V|}.$
+Note that the codeword histograms are normalized by the number of frames $|z|$ in the song in order to ensure comparability between songs of different lengths. Further, the normalization by $1/\tau$ ensures that $\sum_v h_x^{\tau}[v] = 1$, so that for $\tau > 1$, $h_x^{\tau}$ retains its interpretation as a multinomial distribution over $\mathcal{V}$.
+
 
 \subsection{Elias-Pampalk's Choice of Features}
+The music-analysis toolbox that was provided as a part of the initial project-dataset contained a host of functions that were used by Elias Pamapalk's submission for the MIREX'2004 competition. He had chosen to represent each song by certain high level features called 'fluctuation patters' and also, a single-gaussian model for the frames of mfcc coefficients that were extracted from each song. 
+We chose to use the same set of feature-vector representation and distance/similarity computation measures, as we believed that it would serve as an effective base-line for comparing the utility of alternative music-genre classification that pipelines we develop as a part of the course. 
+
+The distance measure was computed using the formula:
+\begin{align*}
+D_{ij} = 0.7*(-exp(-1/450*d_{mfcc})+0.7950)/0.1493 + 0.1*(d_{fp}-1688.4)/878.23 + 0.1*(d_{fpg}-1.2745)/1.1245 + 0.1*(d_{fpb}-1064.8)/932.79 + 10; 
+
+\end{align*}
+We note that the distance measures from different feature-vector representations of the data-set, were combined to obtain a single distance measure by means of numerous parameters that were obtained from other experimental techniques, that the author mentions in his thesis. 
+         
+
 %_________________________________________________________________
 \section{Intrinsic Dimension}
 
@@ -69,6 +117,10 @@ However, for the specialized representations of the songs that we have adopted, 
 \subsection{Information Theoretic Metric Learning}
 
 The method involves assuming that there exists a distribution with the high dimensional space as its support, and also another distribution atop the two-dimensional plane upon which it shall be projected. The algorithm is designed as an optimization problem, which helps to reduce the KL-divergence between the two distributions, where it is expected that the data-points that are similar to each other are closer to each other, while the one's that are dissimilar are located farther away. 
+
+%_________________________________________________________________
+\section{Similarity between songs in song-space}
+
 
 %_________________________________________________________________
 \section{Data Visualization}
@@ -148,11 +200,12 @@ Though, we have described different alternatives for each stage of the data-proc
 \bibitem{multimodalSimilarity}
 \textit{McFee, B. and Lanckriet, G.R.G.}Learning multi-modal similarity, Journal of Machine Learning Research (JMLR) 2011.
 
+\bibitem{codewordHist} \textit{McFee, B., Barrington, L., and Lanckriet, G.R.G.}Learning content similarity for music recommendation, IEEE Transactions on Audio, Speech and Language Processing, 2012.
+
 \bibitem{intrinsicDims}
 \textit{M. Hein, J.-Y. Audibert. }Intrinsic dimensionality estimation of submanifolds in Euclidean space,
 In L. de Raedt and S. Wrobel, editors, Proceedings of the 22nd International Conference on Machine Learning (ICML 2005), 289 - 296, ACM press, 2005, http://www.ml.uni-saarland.de/publications.htm
 
-\bibitem{scikitlearn} Python Scikit-Learn Machine Learning library, http://scikit-learn.org/stable/modules/clustering.html\#clustering
 
 \end{thebibliography}
 \end{document}
