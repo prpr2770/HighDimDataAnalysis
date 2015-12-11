@@ -35,21 +35,23 @@ aggData_mFile = matfile(aggData_allSongs_fileName,'Writable',true);
 
 %}
 
-tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
+tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\testTracks\';
 
 % -----------------------------------------------------------------------
 % Extract Features
 % Read .wav files and generate MFCC, FD_MFCC, DYN_MFCC
 % extractDynMFCC_song_wise(tracksDirName);
 
+
 % extractDynMFCC_song_wise
+
+
 
 
 % extract Normalized MFCC, FD_MFCC, DYN_MFCC
 % compute_songwise_normalized_data(tracksDirName);
 
-
-% compute_songwise_normalized_data
+% compute_songwise_normalize_test_tracks
 
 
 % -----------------------------------------------------------------------
@@ -57,7 +59,7 @@ tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
 
 dataType = 'MFCC'; % 'DYN_MFCC' 'FD_DYN_MFCC'
 
-% %{
+%{
 % Extract from Batches of Songs
 numCodeWordsPerBatch = 512; iter = 20; songsPerBatch = 10;
 extract_codewords_batchwise(tracksDirName, numCodeWordsPerBatch,songsPerBatch,iter, dataType);
@@ -70,11 +72,13 @@ numCodeWords = 512; tau = 2;iter = 50;
 extract_codewords_forallsongs(tracksDirName,numCodeWords, iter)
 %}
 
+% %{
 % -----------------------------------------------------------------------
 % Compute CODEWORD-HIST for each song.
 numCodeWords = 512; tau = 2;
 extract_codeword_histogram_allSongs(tracksDirName, numCodeWords, tau, dataType);
 
 % =========================================================================
+
 % %}
 

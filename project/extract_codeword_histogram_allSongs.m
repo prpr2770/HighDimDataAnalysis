@@ -16,7 +16,7 @@ if (strcmp(dataType,'MFCC') || strcmp(dataType,'DYN_MFCC') || strcmp(dataType,'F
     
     
     % tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
-    [genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
+    
     
     % data directory to store mfcc and dyn_mfcc of each song
     matDataDirName = fullfile(tracksDirName,'song_data')

@@ -12,7 +12,7 @@ totalIter = 20;              % totalIterations for Training-Test crossValids.
 generate_ITML_DistanceMatrix = 0;   % Set 1: To RUN!
 
 dataType = 'MFCC';
-EXPERIMENT_TYPE = 'Original_Data'; % 'tSNE' 'Graph' 'ITML_Graph' 'ITML_tSNE'
+EXPERIMENT_TYPE = 'Graph'; % 'tSNE' 'Graph' 'ITML_Graph' 'ITML_tSNE'  'Original_Data'
 
 % -------------------------------------------------------------------------------
 % FOLDER
@@ -30,13 +30,16 @@ aggregateDataDirName = fullfile(tracksDirName,'aggregate_song_data')
 aggData_allSongs_fileName = strcat(aggregateDataDirName,'\aggData_allSongs.mat');
 aggData_mFile = matfile(aggData_allSongs_fileName,'Writable',true);
 
+% matfile to store aggData_allSongs
+results_fileName = strcat(aggregateDataDirName,'\results.mat');
+results_mFile = matfile(results_fileName,'Writable',true);
 % -------------------------------------------------------------------------
 
 % matfile: storing 'CODEWORD_HIST_ALLSONGS'
 cwHist_fileName = strcat(aggregateDataDirName,'\',dataType,'\cw_histogram_allSongs.mat');
 cwHist_mFile = matfile(cwHist_fileName,'Writable',true);
 
-distMatrix_fileName = strcat(aggregateDataDirName,'\',dataType,'itml_distance_matrix.mat');
+distMatrix_fileName = strcat(aggregateDataDirName,'\',dataType,'\itml_distance_matrix.mat');
 distMatrix_mat = matfile(distMatrix_fileName, 'Writable', true);
 
 % -------------------------------------------------------------------------
@@ -57,20 +60,30 @@ if generate_ITML_DistanceMatrix
     X = dataSet;       % ROW-MATRIX : Every row is a dataPoint
     y = songGenres';    % COL-VECTOR : Every row is a genreID for song.
     
-    [dist_metric dist_matrix] = runITMLonDataSet(X,y)
-    
+    %     [dist_metric dist_matrix] = runITMLonDataSet(X,y)
+    dist_metric = MetricLearningAutotuneKnn(@ItmlAlg, y, X);
+    imagesc(dist_metric)
+    colorbar
     distMatrix_mat.DIST_METRIC = dist_metric;
+    
+    % ------------------------------------------------------
+    % compute Symmetric Distance_Matrix
+    dist_matrix = getDistanceMatrixFromMetric(X,dist_metric);
+    % ------------------------------------------------------
+    % archive/save dist_matrix/metric
     distMatrix_mat.DIST_MATRIX = dist_matrix;
 end
 
+% %{
 % =========================================================================
 %% Experiments:
 % -------------------------------------------------------------------------
 
-switch experimentType
+switch EXPERIMENT_TYPE
     
     case 'Original_Data'
         DATA = dataSet;
+        PLOT_TITLE = sprintf('Plot of CodeWords-%s',dataType);
         
     case 'tSNE'
         % implement tSNE
@@ -102,31 +115,59 @@ switch experimentType
         dist_matrix = distMatrix_mat.DIST_MATRIX;
         
         % generate EMBEDDED points using GraphEmbedding
-        DATA = getRefinedGraphEmbedding(Dataset, dimReducedSpace);
+        %         DATA = getRefinedGraphEmbedding(Dataset, dimReducedSpace);
+        
+        dimReducedSpace = 3;
+        DATA = refinedGraphEmbedding_distanceMatrix(dist_matrix, dimReducedSpace);
         
         PLOT_TITLE = sprintf('ITML + Graph Embedding of CodeWords-%s',dataType);
 end
-%% Implement Clustering
-% -------------------------------------------------------------------------
-
-[mean_ConfusionMatrix, stdDev_ConfusionMatrix] =  run_experiment_train_test_BAM(tracksDirName, DATA, totalIter)
-% -------------------------------------------------------------------------
-avgSuccess = 1/6*trace(mean_ConfusionMatrix);
-msg = sprintf('Average Success: %s_CodeWords = %f',dataType,avgSuccess);
-disp(msg);
 
 % scatter plot for all the data
 fig11 = figure(11)
-colormap prism
+colormap jet
 for i = 1:length(genreKeys)
     songsOfAGenre = find(songGenres == i);
     hue = (length(genreKeys)+1-i)*ones(length(songsOfAGenre),1);
     rad = 30*ones(length(songsOfAGenre),1);
-    h = scatter3(embeddedData(songsOfAGenre,1),embeddedData(songsOfAGenre,2),embeddedData(songsOfAGenre,3),rad,hue,'filled')
+    h = scatter3(DATA(songsOfAGenre,1),DATA(songsOfAGenre,2),DATA(songsOfAGenre,3),rad,hue,'filled');
     hold on
 end
 legend(genreKeys)
 title(PLOT_TITLE)
 hold off
 
+figName = strcat(aggregateDataDirName,'\',dataType,'_',EXPERIMENT_TYPE,'_data.fig');
+savefig(figName);
 
+
+%% Implement Clustering
+% -------------------------------------------------------------------------
+
+[MEAN_C_MATRIX, STD_DEV_C_MATRIX, PROB_SUCCESS_MEAN, AVG_SUCCESS] =  run_experiment_train_test_BAM(tracksDirName, DATA, totalIter);
+ 
+
+fig = figure()
+colormap parula
+subplot(2,1,1)
+imagesc(MEAN_C_MATRIX);
+title('MEAN Confusion Matrix')
+colorbar
+
+subplot(2,1,2)
+imagesc(STD_DEV_C_MATRIX);
+title('STD-DEV Confusion Matrix')
+colorbar
+
+figName = strcat(aggregateDataDirName,'\',dataType,'_',EXPERIMENT_TYPE,'_ConfMatrix.jpg');
+saveas(fig,figName);
+
+% -------------------------------------------------------------------------
+
+msg = sprintf('Average Success: %s_CodeWords = %f',dataType,AVG_SUCCESS);
+disp(msg);
+
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_PROB_SUCCESS_MEAN = PROB_SUCCESS_MEAN;'])
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_AVG_SUCCESS = AVG_SUCCESS;'])
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_STD_DEV_C_MATRIX = STD_DEV_C_MATRIX;'])
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_MEAN_C_MATRIX = MEAN_C_MATRIX;'])

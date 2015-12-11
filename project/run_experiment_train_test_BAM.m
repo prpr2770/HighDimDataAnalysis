@@ -17,7 +17,7 @@ Plots:
 % ========================================================================
 % Determine the Training and Test Data: 
 
-function [mean_ConfusionMatrix, stdDev_ConfusionMatrix] =  run_experiment_train_test_BAM(tracksDirName, dataSet, totalIter)
+function [mean_ConfusionMatrix, stdDev_ConfusionMatrix, genrePercentCorrect, avgSuccessRate] =  run_experiment_train_test_BAM(tracksDirName, dataSet, totalIter)
 %{
 Input: 
 tracksDirName:  Directory containing tracks
@@ -28,6 +28,7 @@ created.
 Output:
 mean_ConfusionMatrix:      mean ConfusionMatrix for the Genres
 stdDev_ConfusionMatrix:     stddev of ConfusionMatrix for the Genres
+
 %}
 
 % Parameters for the code to run.
@@ -41,7 +42,9 @@ stdDev_ConfusionMatrix:     stddev of ConfusionMatrix for the Genres
 [genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
 
 allConfusionMatrices = zeros(length(genreKeys),length(genreKeys),totalIter);
-
+allGenrePercentCorrect = zeros(totalIter,length(genreKeys));
+totalPercentCorrect = zeros(totalIter,1);
+    
 for iter = 1:totalIter
     iter
     % -------------------------------------------------------------------
@@ -142,19 +145,20 @@ anTestData = embeddedPoints_test';
 anTestGenreIndex = reshape(testData_genreID,1,[]);
 anTrainingGenreIndex = reshape(trainData_genreID,1,[]);
 
-num_nbrs = 5;
-weight_type = 3;
-weight_sigma = 4*pi^2;
-test_equal_training_data = 0 ;
+BAM_test_experiment_results
 
-BAM_generate_experiment_results
-    
-confusionMatrix = anTestData_ConfusionMatrix;
+% anPercentCorrect, nAllPercentCorrect
 
-size(confusionMatrix)
-    % ========================================================================
+% confusionMatrix = anTestData_ConfusionMatrix(:,:,4);
+sumConf = sum(anConfusionMatrix,1);
+factorMatrix = repmat(sumConf,length(anConfusionMatrix),1);
+confusionMatrix = anConfusionMatrix./factorMatrix;
 
-    allConfusionMatrices(:,:,iter) = confusionMatrix(:,:,2);
+% ========================================================================
+
+    allConfusionMatrices(:,:,iter) = confusionMatrix;
+    allGenrePercentCorrect(1,:,iter) = anPercentCorrect;
+    totalPercentCorrect(iter,1) = nAllPercentCorrect;
 end
 
 % Computing Mean and Std-Dev of the Confusion Matrices
@@ -168,27 +172,9 @@ var_ConfusionMatrix = 1/totalIter * sum((allConfusionMatrices - mean_ConfusionMa
 
 stdDev_ConfusionMatrix = var_ConfusionMatrix.^(0.5);
 
-%{
-% Compute STD_DEV iteratively.
-diffSum = zeros(size(mean_ConfusionMatrix));
-for i = 1: totalIter
-    diffSum = diffSum + (allConfusionMatrices(:,:,i) - mean_ConfusionMatrix).^2;
-end
-stdDev_ConfusionMatrix = (1/totalIter*diffSum).^(1/2)
-%}
-
-
-fig = figure()
-colormap parula
-subplot(2,1,1)
-imagesc(mean_ConfusionMatrix);
-title('MEAN Confusion Matrix')
-colorbar
-
-subplot(2,1,2)
-imagesc(stdDev_ConfusionMatrix);
-title('STD-DEV Confusion Matrix')
-colorbar
+% computing the totalAverage
+genrePercentCorrect = sum(allGenrePercentCorrect,1)/ totalIter; 
+avgSuccessRate = sum(totalPercentCorrect)/totalIter;
 
 end
 

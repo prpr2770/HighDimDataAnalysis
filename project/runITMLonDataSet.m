@@ -12,6 +12,6 @@ colorbar
 
 % ------------------------------------------------------
 % compute Symmetric Distance_Matrix
-dist_matrix = getDistanceMatrixFromMetric(X,distance_metric);
+dist_matrix = getDistanceMatrixFromMetric(X,dist_metric);
 
 end

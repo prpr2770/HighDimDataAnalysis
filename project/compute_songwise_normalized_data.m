@@ -18,8 +18,6 @@ b) STD_[]
 % function compute_songwise_normalized_data(tracksDirName)
 
 
-[genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
-
 % data directory to store mfcc and dyn_mfcc of each song
 matDataDirName = fullfile(tracksDirName,'song_data')
 

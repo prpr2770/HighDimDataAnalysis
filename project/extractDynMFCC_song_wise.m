@@ -17,10 +17,7 @@ quantization).
 % =========================================================================
 % clear all; close all; clc;
 
-tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
-[genreKeys songGenres] = getGenreKeysForSongs(tracksDirName);
-
-
+% tracksDirName = 'H:\HighDimData\Project\ecen5322\Volumes\project\tracks\';
 
 
 % data directory to store mfcc and dyn_mfcc of each song

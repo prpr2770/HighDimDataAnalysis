@@ -13,8 +13,9 @@ sigmaSqr = 4*pi^2;  % Gaussian RBF
 mutualDistance = zeros(totalPoints,totalPoints);
 mutualSimilarity = zeros(totalPoints,totalPoints);
 
+tic
 for i=1:totalPoints
-    
+    i
     ref_vec = Dataset(i,:);
     ref_vec_repMat = repmat(ref_vec,totalPoints,1);
     
@@ -37,7 +38,7 @@ for i=1:totalPoints
 
     
 end
-
+toc
 % ===========================================================
 % Graph Theoretic Operations: Adjacency, Weight, Laplacian
 
@@ -45,6 +46,7 @@ Adj_M = mutualSimilarity;  % DETERMINE A THRESHOLDING FOR THIS MATRIX ???
 deg_V = sum(Adj_M,2); %rowsum
 Deg_M = diag(deg_V);
 
+warning('Laplacian')
 Laplacian_M = Deg_M - Adj_M;
 normLaplacian_M = Deg_M^(-0.5)*(eye(size(Adj_M)) - Adj_M)*Deg_M^(-0.5);
 
@@ -59,8 +61,12 @@ probTrans_M = inv(Deg_M)*Adj_M;
 [eigVecs,Lambda_M] = eigs(normLaplacian_M,(dimReducedSpace+1));
 lambda = diag(Lambda_M);
 
+warning('Stationary Markov Chain')
+tic
 % Determine Stationary Distribution of Markov Chain: Is this a ROW VEC?
-PI_vec = stationaryDist_MarkovChain(probTrans_M);
+% PI_vec = stationaryDist_MarkovChain(probTrans_M);
+PI_vec = stationaryDist_MC(probTrans_M);
+toc
 % extract required components of pi_Vec
 pi_red_vec = PI_vec(1: dimReducedSpace + 1);
 
@@ -71,6 +77,7 @@ factor = lambda.*pi_red_vec;           % Column Vector
 scaleFactor = 1./sqrt(factor(2:end)'); % Discard First Value; Row Vector
 scaleFactor_M = repmat(scaleFactor,totalPoints,1);
 
+warning('Refined Embedding')
 % Compute: REFINED EMBEDDING
 embeddedPoints = scaleFactor_M.*eigVecs(:,2:end);
 

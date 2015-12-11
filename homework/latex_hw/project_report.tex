@@ -69,21 +69,21 @@ Mathematically, the code-word histogram generation process can be described as f
 \subsubsection{Codebook training}
 The primary audio feature descriptor used for training of the codebook, is the mfcc coefficients of frames of a song. The audio-feature descriptors of all the songs in the database is aggregated into a single bag-of-features, which is then clustered to produce the codebook. In our implementation, the number of words in the codeword dictionary is arbitrarily chosen to be about 512. 
 
-For each song $x$ in the codebook training set $X_C$, we compute the 13 MelFrequency cepstral coefficients(mfcc) from each overlapping 25-ms frame. From the time-series of the MFCC vectors we compute the first and second instantaneous derivatives, which are concatanated to form a sequence of 13x2 dimensional first-order Dynamic-MFCC( FD_DYN_MFCC ) and 13x3 dimensional Dynamic-MFCC(DYN_MFCC). These descriptors are then aggregated across all $x \in X_C$ to form an unordered bag of features $Z$, where each $z \in Z \subset \R^D$ is either an MFCC, FD_DYN_MFCC or DYN_MFCC feature-vector representation of the song-frames.
+For each song $x$ in the codebook training set $X_C$, we compute the 13 MelFrequency cepstral coefficients(mfcc) from each overlapping 25-ms frame. From the time-series of the MFCC vectors we compute the first and second instantaneous derivatives, which are concatanated to form a sequence of $13x2$ dimensional first-order Dynamic-MFCC( FD-DYN-MFCC ) and 13x3 dimensional Dynamic-MFCC(DYN-MFCC). These descriptors are then aggregated across all $x \in X_C$ to form an unordered bag of features $Z$, where each $ z \in Z \subset \mathcal{R}^D $ is either an MFCC, FD-DYN-MFCC or DYN-MFCC feature-vector representation of the song-frames.
 
-To correct for changes in scale across different dimensions of $z \in Z$, each vector is normalized according to the sample mean $\mu \in \R^D$ and standard deviation $\sigma \in \R^D$ estimated from $Z$. The i'th coordinte is mapped by
+To correct for changes in scale across different dimensions of $ z \in Z$, each vector is normalized according to the sample mean $\mu \in \mathcal{R}^D$ and standard deviation $\sigma \in \mathcal{R}^D$ estimated from $Z$. The i'th coordinte is mapped by
 \begin{align}
 z[i] \mapsto \frac{z[i] - \mu[i]}{\sigma[i]}. \label{eq:NormlizeMFCC}
 \end{align}The normalized feature vectors are then clustered into a set $\mathcal{V}$ of $|V| = 512$ codewords by k-means algorithm.
 
-\subsubsection{(Top \tau) Vector Quantization}
-Once the codebook $\mathcal{V}$ has been constructed, a song $x \in X_C$, is represented as a histogram $h_x$ over the codewords in the codebook. Each song $x \in X_C$ is understood to be a time-sequence of feature-vectors, $z = {z_i} \in Z \subset \R^D$ where $z_i$ is the feature-vector representation of a frame in the song. Each $z_i \in z$ is normalized according to \eqref{eq:NormlizeMFCC}. The codeword histogram of song $x \in X_C$ is constructed by counting the frequency with which each codeword $v \in \mathcal{V}$ quantizes the elements of $z$ i.e
+\subsubsection{(Top $\tau$) Vector Quantization}
+Once the codebook $\mathcal{V}$ has been constructed, a song $x \in X_C$, is represented as a histogram $h_x$ over the codewords in the codebook. Each song $x \in X_C$ is understood to be a time-sequence of feature-vectors, $ z = {z_i} \in Z \subset \mathcal{R}^D$ where $z_i$ is the feature-vector representation of a frame in the song. Each $ z_i \in z$ is normalized according to \eqref{eq:NormlizeMFCC}. The codeword histogram of song $x \in X_C$ is constructed by counting the frequency with which each codeword $v \in \mathcal{V}$ quantizes the elements of $z$ i.e
 \begin{align}
-h_x[v] = \frac{1}{|z|} \sum_{z_i \in z} \frac{1}{\tau}\i\bigg\left[v = \argmin_{u \in \mathcal{V}}^{\tau}||z_i - u|| \bigg\right] \label{eq:wc_Hist_Defn}
+h_x[v] = \frac{1}{|z|} \sum_{z_i \in z} \frac{1}{\tau}\i\bigg\lbrace v = arg\min_{u \in \mathcal{V}}^{\tau}||z_i - u|| \bigg\rbrace. \label{eq:wc_Hist_Defn}
 \end{align}
 where we have chosen to adopt multiple codeword quantizers of each vector $z_i$ by defining the quantization set
 \begin{align}
-\argmin_{u \in \mathcal{V}}^{\tau} = {u \text{ is a } \tau \text{nearest neighbor of }z_i}. \label{eq:TauQuantize}
+arg\min_{u \in \mathcal{V}}^{\tau} = {u \text{ is a } \tau \text{nearest neighbor of }z_i}. \label{eq:TauQuantize}
 \end{align}
 where $\tau \in {1,2,\cdots, |V|}.$
 Note that the codeword histograms are normalized by the number of frames $|z|$ in the song in order to ensure comparability between songs of different lengths. Further, the normalization by $1/\tau$ ensures that $\sum_v h_x^{\tau}[v] = 1$, so that for $\tau > 1$, $h_x^{\tau}$ retains its interpretation as a multinomial distribution over $\mathcal{V}$.
@@ -95,8 +95,8 @@ We chose to use the same set of feature-vector representation and distance/simil
 
 The distance measure was computed using the formula:
 \begin{align*}
-D_{ij} = 0.7*(-exp(-1/450*d_{mfcc})+0.7950)/0.1493 + 0.1*(d_{fp}-1688.4)/878.23 + 0.1*(d_{fpg}-1.2745)/1.1245 + 0.1*(d_{fpb}-1064.8)/932.79 + 10; 
-
+D_{ij} &= 0.7*(-exp(-1/450*d_{mfcc})+0.7950)/0.1493 + 0.1*(d_{fp}-1688.4)/878.23 \\
+&+ 0.1*(d_{fpg}-1.2745)/1.1245 + 0.1*(d_{fpb}-1064.8)/932.79 + 10; 
 \end{align*}
 We note that the distance measures from different feature-vector representations of the data-set, were combined to obtain a single distance measure by means of numerous parameters that were obtained from other experimental techniques, that the author mentions in his thesis. 
          
@@ -112,15 +112,43 @@ It is assumed that the datasset associated with the different genres, can be cla
 
 The choice of the Distance-Metric depends on the chosen Feature-Vector-representation for each song. The naive method to proceed would be to assume that all the songs are embedded in an Euclidean Space, and hence the distances can be computed using the L-2 Norm. 
 
-However, for the specialized representations of the songs that we have adopted, we believed that the songs are distributed over a manifold, and hence the distance between the points need to be computed by using a metric intrinsic to that manifold. To explore this idea, we have decided to implement the Information Theoretic Metric Learning toolbox \cite{infoTheoryMetricLearning}, for determining the appropriate "metric" that helps classify and categorize the music genres. 
+However, for the specialized representations of the songs that we have adopted, we believe that the songs are distributed over a manifold, and hence the distance between the points need to be computed by using a metric intrinsic to that manifold. To explore this idea, we have decided to implement the Information Theoretic Metric Learning toolbox \cite{infoTheoryMetricLearning}, for determining the appropriate "metric" that helps classify and categorize the music genres. 
 
 \subsection{Information Theoretic Metric Learning}
 
-The method involves assuming that there exists a distribution with the high dimensional space as its support, and also another distribution atop the two-dimensional plane upon which it shall be projected. The algorithm is designed as an optimization problem, which helps to reduce the KL-divergence between the two distributions, where it is expected that the data-points that are similar to each other are closer to each other, while the one's that are dissimilar are located farther away. 
+The information theoretic metric learning \cite{infoTheoryMetricLearning} approach to learning the distance function, is a particular technique for computing the Mahalanobis distance between two points in a metric-space. The Mahalanobis distance generalizes the standard Euclidean distance by admitting arbitrary linear scalings and rotations of the feature space. The problem of learning an optimial distance-metric is translated to learning the optimal Gaussian with respect to an entropic objective function. The model adopted leverages the relationship between the multivariate Gaussian distribution and the set of Mahalanobis distances. 
+
+Given a set of points ${x_i} \subset \mathcal{R}^n$, and a distance metric A, the distance measure between the points is computed as
+\begin{align*}
+d_A(x_i,x_j) = (x_i - x_j)^TA(x_i - x_j)
+\end{align*}Consider (dis)similarity relationships between points provided by information regarding the points belonging to the same(or different) genres. This may also be interpreted as, similar points have their Mahalanobis distance less than a given upper-bound $(d_A(x_i,x_j) \leq u)$, and dissimilar points have their distances greater than a lower-bound $(d_A(x_i,x_j) \geq l)$, for sufficiently large l. 
+
+Assume that we have two different metrics, $A$ and $A_0$. We can quantify the closeness between $A$ and $A_0$ via a natural information-theoretic approach. There exists a simple bijection between the set of Mahalanobis distances and the set of Gaussian Multivariate distributions. Given a Mahalanobis distance characterized by A, we express its corresponding multivariate Gaussian as $p(x;A) = \frac{1}{Z} exp( - \frac{1}{2}d_A(x,\mu))$, where Z is a normalizing constant and $A^(-1)$ is the covariance of the gaussian distribution about the mean $\mu$. Using this bijection, we measure the distance between two Mahalanobis distance functions parametrized by $A_0$ and $A$ by the differential relative entropy between their corresponding multivariate Gaussians:
+\begin{align}
+KL(A_0||A) = \int p(x;A_0) log( \frac{p(x;A_0)}{p(x;A)}) dx
+\end{align}
+The distance provides a well-founded measure of closeness between two mahalanobis distance functions and forms the basis  of the optimization problem given below:
+
+Given the pair of similar points S and set of pairs of dissimilar points D, the distance-metric learning problem is
+\begin{align}
+\begin{array}{ccc}
+min_A &  KL(p(x;A_0)||p(x;A))& \\
+\text{subject to} & d_A(x_i, x_j) \leq u & (i,j) \in S\\
+ & d_A(x_i, x_j) \geq l & (i,j) \in D.
+\end{array}
+\end{align}
+The above optimization problem is solved as a log-determinant optimization problem. The details of the algorithm used and the implementation of the algorithm can be found in the original research paper referenced below \cite{infoTheoryMetricLearning}.
 
 %_________________________________________________________________
 \section{Similarity between songs in song-space}
+Given a measure of distances between songs, as computed by the computed/assumed distance metrics, we also have information regarding the genre-id's of each song. We expect that songs of a same genres are more similar than songs of dissimilar genres. The similarities between songs can be quantitatively represented as a matrix containing values which are a function of the distances between the points. 
 
+When using only the distance information to describe similarity, we can choose the function to be any number of non-linear functions like:
+\begin{enumerate}
+\item Gaussian Similarity $s_{ij} = exp(-d_{ij}^2 / 2\sigma)$,
+\item Inverse distance $s_{ij} = \frac{1}{1 + d_{ij}^p}$, where $p \geq 1$,etc.
+\end{enumerate}
+We use the Similarity Matrices computed above, as inputs to some of the nonlinear dimension reduction techniques like the Refined-Graph-Embedding.
 
 %_________________________________________________________________
 \section{Data Visualization}
@@ -139,7 +167,34 @@ Linear method using Fast Johnson-Lindenstrauss transform (FJLT) algorithm.  This
 Non-linear, Graph-based Refined Embedding. This method builds a similarity graph, between all the datapoints, where the edge-weights are computed using a particular kernel function and distance-metric. From the similarity graph, we derive the Graph-Laplacian and follow the procedure of spectral embedding of this graph. The eigenvalues and the eigenvectors of the Graph Laplacian shall indicate the existence of the clusters. 
 
 
+\subsection{Fast JL Transform}
 
+\subsection{Refined Graph Embedding}
+
+\subsection{t-Distributed Stochastic Neighbour Embedding}
+The t-SNE algorithm \cite{tSNEdataViz}, was introduced earlier as a technique for visualization of high-dimensional datasets, to built a visual intuition of the data-distribution. From the fact that local neighbourhood information of the data is preserved by the technique, it would serve as a useful dimensional reduction technique, and hence used this method as an alternative to the Graph Embedding Technique.
+
+tSNE starts by converting the high-dimensional Euclidean distances between data points  into conditional probabilities that represent similarities. The similarity of data-point $x_j$ to $x_i$ is the conditional probability $p_{j|i}$ that $x_i$ would pick $x_j$ as a neighbour, if the neighbours were picked in proportion to their probability density under a Gaussian centred at $x_i$. Mathematically, the conditional probability is computed as
+\begin{align}
+p_{j|i} = \frac{exp( - d_{ij}^2/ 2\sigma_i^2)}{\sum_{k \ne i} exp( - d_{ik}^2/ 2\sigma_i^2)}\label{eq:prob_nbr_HD}
+\end{align} where $\sigma_i$ is the variance of the Gaussian centred about $x_i$. Because, we are only interested  in modelling pairwise similarities, we set the value of $p_{i|i} = 0$.
+
+Now, we assume that there's a particular projection operation that projects each of the songs $x_i$ to lower dimensional point $y_i$. For the low dimensional counterparts $y_i$ and $y_j$ of the high-dimensional points $x_i$ and $x_j$, we can compute the conditional probability, $q_{j|i}$ as 
+\begin{align}
+q_{j|i} = \frac{(1 + d_{ij}^2)^(-1)}{\sum_{k \ne i} (1 + d_{ik}^2)^(-1)}
+\end{align}
+where, we use a t-Student distribution with a single degree of freedom, instead of a Gaussian distribution about point $y_i$. This is because, it has the particularly nice property that $(1 + d_{ij}^2)^(-1)$ approaches an inverse-square law for large pairwise distances in the low-dimensional map. This makes the maps representation of the joint probabilities almost invariant to changes in scale of the map for points that are far apart. Which also implies that large clusters of points that are far apart interact in just the same way as individual points, so the optimization operates in the same way at all but the finest scales. 
+
+If the projections correctly model the similarity of the points in the high dimensional space, then the conditional probabilities $p_{j|i} = q_{j|i}$. Motivated by this intuition, the tSNE algorithm aims to find a low-dimensional data representation that tries to minimize the mismatch between joint conditional probabilities P and Q.	A natural measure of the distance between two distributions is the Kulback Liebler-divergence. tSNE minimizes the KL-divergence between P and Q, via a gradient descent algorithm. The cost function is given by
+\begin{align}
+C = \sum_i KL(P_i || Q_i) = \sum_i \sum_j p_{j|i} log(\frac{p_{j|i}}{q_{j|i}})\label{eq:Cost_tSNE}
+\end{align}
+where it is assumed that $\sigma_i = \sigma$ for all data-points. 
+
+The gradient of the Kullback-Liebler divergence between P and the t-Student based joint probability distirbution Q is given by
+\begin{align}
+\frac{\delta C}{\delta y_i} =  4 \sum_j (p_{ij} - q_{ij})(y_i - y_j)(1 + d_{ij}^2)^(-1)\label{eq:Grad_KL_tsne}
+\end{align} where $d_{ij} = ||y_i - y_j||$
 
 %_________________________________________________________________
 \section{Clustering and Statistical Learning}
@@ -173,7 +228,7 @@ The different pipelines are evaluated in the following manner.
 The feature vectors of concern is extracted for every song in the database. The distance metric used to computed the distance between the feature vectors is either assumed to be Euclidean, or is learned by using the 'Information Theoretic Metric Learning' \cite{infoTheoryMetricLearning} toolbox. Using the distance metric and the 'true' genre assignments (from the truth file) we use different dimensional reduction techniques to embed the data points into a smaller m-dimensional space. As a default value, for a preliminary run of the experiments, we have chosen $m = 3$. However, further experiments are required to determine the clustering accuracy on increasing the dimensions. One of the interesting experiments we identified, was to determine the intrinsic-dimensionality of the different genres, under different choice of feature-vector representation of the songs. This would give us some information on how to upper-bound the dimension(m) of the feature-space for the embedding procedure.
 
 After computing the embedding of the songs in the reduced dimensional space, we adopt an iterative procedure of cross-validation of our classification scheme. At every iteration, the entire music database is randomly split into two segments - the training(~80\%) and testing dataset(~20\%), by generating proportional partitions within each genre.
-To be precise, for every genre, the set of all songs belong to it is partitioned into two subsets - training_set$(~80\%)$ and testing_set$(~20\%)$. The global-training-set(testing) is obtained by coalescing all the training-sets(testing) of each genre into one set. For each song, within the global-training-set, we determine its cluster-membership, by seeking out its neighbours from the global-training-set, and implementing a voting scheme. The results of the cluster-membership-assignment for the testing-set is compiled by creating a confusion-matrix. 
+To be precise, for every genre, the set of all songs belong to it is partitioned into two subsets - training-set$(~80\%)$ and testing-set$(~20\%)$. The global-training-set(testing) is obtained by coalescing all the training-sets(testing) of each genre into one set. For each song, within the global-training-set, we determine its cluster-membership, by seeking out its neighbours from the global-training-set, and implementing a voting scheme. The results of the cluster-membership-assignment for the testing-set is compiled by creating a confusion-matrix. 
 
 The confusion-matrix is obtained by determining the percentage of songs of a given genre, that have been classified as belonging to each of the unique genre-types. This is possible, as the information regarding the true-categorization of the testing-data is known to us.   The mean and standard-deviation of the confusion-matrices obtained over all iterations, for a given genre-classification-pipeline, are computed and archived. The effectiveness of each pipeline is determined by comparing these statistics of the confusion matrices. 
 
