@@ -17,7 +17,7 @@ Plots:
 % ========================================================================
 % Determine the Training and Test Data: 
 
-function [mean_ConfusionMatrix, stdDev_ConfusionMatrix, genrePercentCorrect, avgSuccessRate] =  run_experiment_train_test_BAM(tracksDirName, dataSet, totalIter)
+function [mean_ConfusionMatrix, stdDev_ConfusionMatrix, mean_GenrePercentCorrect, std_GenrePercentCorrect, avgSuccessRate, stdDev_SuccessRate] =  run_experiment_train_test_BAM(tracksDirName, dataSet, totalIter)
 %{
 Input: 
 tracksDirName:  Directory containing tracks
@@ -172,9 +172,14 @@ var_ConfusionMatrix = 1/totalIter * sum((allConfusionMatrices - mean_ConfusionMa
 
 stdDev_ConfusionMatrix = var_ConfusionMatrix.^(0.5);
 
-% computing the totalAverage
-genrePercentCorrect = sum(allGenrePercentCorrect,1)/ totalIter; 
+% computing the totalAverage and stdDev
+mean_GenrePercentCorrect = diag(mean_ConfusionMatrix); 
+std_GenrePercentCorrect = diag(stdDev_ConfusionMatrix);
+
 avgSuccessRate = sum(totalPercentCorrect)/totalIter;
+mu_vec = repmat(avgSuccessRate,totalIter,1);
+stdDev_SuccessRate = sqrt(sum((totalPercentCorrect - mu_vec).^2)/totalIter);
+
 
 end
 

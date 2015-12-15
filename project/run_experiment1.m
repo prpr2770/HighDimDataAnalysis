@@ -144,8 +144,8 @@ savefig(figName);
 %% Implement Clustering
 % -------------------------------------------------------------------------
 
-[MEAN_C_MATRIX, STD_DEV_C_MATRIX, PROB_SUCCESS_MEAN, AVG_SUCCESS] =  run_experiment_train_test_BAM(tracksDirName, DATA, totalIter);
- 
+% [MEAN_C_MATRIX, STD_DEV_C_MATRIX, PROB_SUCCESS_MEAN, AVG_SUCCESS] =  run_experiment_train_test_BAM(tracksDirName, DATA, totalIter);
+[MEAN_C_MATRIX, STD_DEV_C_MATRIX, MEAN_GENRE_SUCCESS, STD_GENRE_SUCCESS, AVG_SUCCESS, STD_SUCCESS] =  run_experiment_train_test_BAM(tracksDirName, dataSet, totalIter)
 
 fig = figure()
 colormap parula
@@ -167,7 +167,12 @@ saveas(fig,figName);
 msg = sprintf('Average Success: %s_CodeWords = %f',dataType,AVG_SUCCESS);
 disp(msg);
 
-eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_PROB_SUCCESS_MEAN = PROB_SUCCESS_MEAN;'])
-eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_AVG_SUCCESS = AVG_SUCCESS;'])
 eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_STD_DEV_C_MATRIX = STD_DEV_C_MATRIX;'])
 eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_MEAN_C_MATRIX = MEAN_C_MATRIX;'])
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_MEAN_GENRE_SUCCESS = MEAN_GENRE_SUCCESS;'])
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_STD_GENRE_SUCCESS = STD_GENRE_SUCCESS;'])
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_AVG_SUCCESS = AVG_SUCCESS;'])
+eval(['results_mFile.',dataType,'_',EXPERIMENT_TYPE,'_STD_SUCCESS = STD_SUCCESS;'])
+
+MEAN_GENRE_SUCCESS = MEAN_GENRE_SUCCESS';
+STD_GENRE_SUCCESS = STD_GENRE_SUCCESS';

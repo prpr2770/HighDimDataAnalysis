@@ -1,5 +1,8 @@
-\documentclass[12pt]{article}
-\usepackage{graphicx}
+\documentclass[10pt]{article}
+\usepackage[final]{graphicx}
+%\usepackage{graphicx}
+\usepackage{float}
+\usepackage[caption = false]{subfig}
 \usepackage{amsmath,amssymb}
 \textheight 240mm
 \textwidth  170mm
@@ -17,9 +20,9 @@
 
 Audio/Music hosting applications like Pandora, Spotify, SoundCloud, Saavn etc, have the immense responsibility of being expected to serve as search-engines within the audio/sound-space. As a user, one expects that one's "taste" in music, is "understood"(learned) by the application, and that it shall then help the user explore and listen to artistes, tracks and albums, that would otherwise be difficult for the user, to individually search out for herself. The greater the search and exploratory experience, the better is the chance of the application being the favoured source of music-entertainment for its human-user-base.
 
-Given this context, the course project helps give us a hands-on experience with building up a "music-genre classification engine". In the "music-genre classification" problem, we are required to determine the genre of a given query song, based on an algorithm that builds an internal representation of different music-genres, using a fixed database of classified(tagged) songs. The purpose of the project, is to enable the student to understand how to build a rudimentary functional prototype of a music-classification system. As a design challenge, the students are required to understand the high-level process of mining for patterns in a given music database,to split the process-flow into different sub-systems(algorithms) and determine how these functional-blocks may be combined to determine a process-flow for improving the efficiency of the classification problem. The specifications of the course-project as described in the project-guide, indicates the genres we need to focus on and the number of songs assigned to each genre. 
+Given this context, the course project helps to give us a hands-on experience with building up a "music-genre classification engine". In the "music-genre classification" problem, we are required to determine the genre of a given query song, based on an algorithm that builds an internal representation of different music-genres, using a fixed database of classified(tagged) songs. The purpose of the project, is to enable the student to understand how to build a rudimentary (but functional) prototype of a music-classification system. As a design challenge, the students are required to understand the high-level process of mining for patterns in a given music database, to split the process-flow into different sub-systems(algorithms) and determine how these functional-blocks may be combined to determine a process-flow for improving the efficiency of the classification problem. The specifications of the course-project as described in the project-guide, indicates the genres we need to focus on and the number of songs assigned to each genre. 
 
-The music-genre classification process can be summarized by a five-stage pipeline. 
+The music-genre classification process can be summarized by the following stages: 
 \begin{enumerate}
 \item Embedding of Dataset into a Metric Space:\\
 It is important to note that the representation of data-files in memory, needs to be chosen based on the application for which that data shall be utilized. A given song when represented/stored as a .mp3 or .wav file, may be processed and played using an Audio player. However, for the purpose of classification, we need to design/develop a particular vector-representation that incorporates certain "descriptive features" of the audio file. These "features" may be based on analytical notions of time-frequency domain representation or based on "perceptive/cognitive" notions. The representation of these features, as mathematical vectors embedded in a high-dimensional space, then permits us to use algorithms for processing vectorial data, for the purpose of automated classification/clustering. We intend to use the "mel-frequency cepstral coefficients", its derivatives and possibly other "high-level-feature" information for each of the song files. 
@@ -49,11 +52,7 @@ This forms the final stage of the Genre-Detection problem. Once the abstract mod
 %_________________________________________________________________
 \section{Feature vector representation}
 
-To derive content-based features representative of songs, we would have to implement digitial signal-processing algorithms upon the .wav song files, to compute quantitative information about the song. Some of the features that can be extracted from a song are mfcc, fluctuation patters, etc. 
-
-<Explain the different possible features, in particular mfcc>. 
-
-In this project, we focus on using the Spectral Information of the songs, to serve as the signature of each song. Songs are then classified into genre based on the similarity between these signatures. 
+To derive content-based features representative of songs, we would have to implement digitial signal-processing algorithms upon the .wav song files, to compute quantitative information about the song. Some of the features that can be extracted from a song are mfcc, fluctuation patters, etc. In this project, we focus on using the Spectral Information of the songs - represented by MFCC Coefficients, to serve as the primary signature of a song-frame. Songs are then classified into genre based on the similarity between these signatures. 
 
 \subsection{Single Gaussian Model of each song}
 
@@ -69,7 +68,7 @@ Mathematically, the code-word histogram generation process can be described as f
 \subsubsection{Codebook training}
 The primary audio feature descriptor used for training of the codebook, is the mfcc coefficients of frames of a song. The audio-feature descriptors of all the songs in the database is aggregated into a single bag-of-features, which is then clustered to produce the codebook. In our implementation, the number of words in the codeword dictionary is arbitrarily chosen to be about 512. 
 
-For each song $x$ in the codebook training set $X_C$, we compute the 13 MelFrequency cepstral coefficients(mfcc) from each overlapping 25-ms frame. From the time-series of the MFCC vectors we compute the first and second instantaneous derivatives, which are concatanated to form a sequence of $13x2$ dimensional first-order Dynamic-MFCC( FD-DYN-MFCC ) and 13x3 dimensional Dynamic-MFCC(DYN-MFCC). These descriptors are then aggregated across all $x \in X_C$ to form an unordered bag of features $Z$, where each $ z \in Z \subset \mathcal{R}^D $ is either an MFCC, FD-DYN-MFCC or DYN-MFCC feature-vector representation of the song-frames.
+For each song $x$ in the codebook training set $X_C$, we compute the 13 MelFrequency cepstral coefficients(mfcc) from each overlapping 25-ms frame. From the time-series of the MFCC vectors we compute the first and second instantaneous derivatives, which are concatenated to form a sequence of $13 \times 2$ dimensional \emph{first-order dynamic-MFCC}( FD-DYN-MFCC ) and $13\times 3$ dimensional \emph{dynamic-MFCC}(DYN-MFCC). These descriptors are then aggregated across all $x \in X_C$ to form an unordered bag of features $Z$, where each $ z \in Z \subset \mathcal{R}^D $ is either an MFCC, FD-DYN-MFCC or DYN-MFCC feature-vector representation of the song-frames.
 
 To correct for changes in scale across different dimensions of $ z \in Z$, each vector is normalized according to the sample mean $\mu \in \mathcal{R}^D$ and standard deviation $\sigma \in \mathcal{R}^D$ estimated from $Z$. The i'th coordinte is mapped by
 \begin{align}
@@ -83,14 +82,14 @@ h_x[v] = \frac{1}{|z|} \sum_{z_i \in z} \frac{1}{\tau}\i\bigg\lbrace v = arg\min
 \end{align}
 where we have chosen to adopt multiple codeword quantizers of each vector $z_i$ by defining the quantization set
 \begin{align}
-arg\min_{u \in \mathcal{V}}^{\tau} = {u \text{ is a } \tau \text{nearest neighbor of }z_i}. \label{eq:TauQuantize}
+arg\min_{u \in \mathcal{V}}^{\tau} = \big\lbrace u \text{ is a } \tau \text{-nearest neighbor of }z_i \big\rbrace. \label{eq:TauQuantize}
 \end{align}
 where $\tau \in {1,2,\cdots, |V|}.$
 Note that the codeword histograms are normalized by the number of frames $|z|$ in the song in order to ensure comparability between songs of different lengths. Further, the normalization by $1/\tau$ ensures that $\sum_v h_x^{\tau}[v] = 1$, so that for $\tau > 1$, $h_x^{\tau}$ retains its interpretation as a multinomial distribution over $\mathcal{V}$.
 
 
 \subsection{Elias-Pampalk's Choice of Features}
-The music-analysis toolbox that was provided as a part of the initial project-dataset contained a host of functions that were used by Elias Pamapalk's submission for the MIREX'2004 competition. He had chosen to represent each song by certain high level features called 'fluctuation patters' and also, a single-gaussian model for the frames of mfcc coefficients that were extracted from each song. 
+The music-analysis toolbox that was provided as a part of the initial project-dataset contained a host of functions that were used by Elias Pamapalk's submission for the MIREX'2004 competition \cite{eliaspam}. He had chosen to represent each song by certain high level features called 'fluctuation patters' and also, a single-gaussian model for the frames of mfcc coefficients that were extracted from each song. 
 We chose to use the same set of feature-vector representation and distance/similarity computation measures, as we believed that it would serve as an effective base-line for comparing the utility of alternative music-genre classification that pipelines we develop as a part of the course. 
 
 The distance measure was computed using the formula:
@@ -99,12 +98,7 @@ D_{ij} &= 0.7*(-exp(-1/450*d_{mfcc})+0.7950)/0.1493 + 0.1*(d_{fp}-1688.4)/878.23
 &+ 0.1*(d_{fpg}-1.2745)/1.1245 + 0.1*(d_{fpb}-1064.8)/932.79 + 10; 
 \end{align*}
 We note that the distance measures from different feature-vector representations of the data-set, were combined to obtain a single distance measure by means of numerous parameters that were obtained from other experimental techniques, that the author mentions in his thesis. 
-         
-
-%_________________________________________________________________
-\section{Intrinsic Dimension}
-
-It is assumed that the datasset associated with the different genres, can be classified into distinctively separate nodes-spaces of the abstract high-dimensional euclidean space within which each data point exists. The algorithm presented in \cite{intrinsicDims} shall be implemented for the given dataset. It needs to determined, if the formulation of intrinsic dimension of the dataset is affected by the choice of the "metric" describing the distance between the nodes. The computation of the intrinsic dimension of each of the genres, shall help us determine the minimal dimension of the reduced-dimensional space within which all the data-points can be suitably represented without any significant loss of information. 
+    
 
 
 %_________________________________________________________________
@@ -168,8 +162,34 @@ Non-linear, Graph-based Refined Embedding. This method builds a similarity graph
 
 
 \subsection{Fast JL Transform}
+In some implementations of our test algorithms, we use the Fast Johnson-Lindestrauss Transform (FJLT)\cite{fjltAlgo} as a method to reduce the dimensionality of our feature vector data.  This allows a fast, robust method for which to reduce the dimension while incurring a slight deformation of the pair-wise distances between data points in Euclidean space.
+\begin{align*}
+||x-y||_2 (1-\epsilon) \leq C ||\Phi x - \Phi y ||_2 \leq ||x-y||_2 (1 + \epsilon)
+\end{align*}
+
+We show that with our 256-dimension feature vector for each of 729 songs, we can reduce the feature representation to 20 dimensions while incurring a reasonable deformation of the pair-wise distances.  The non-uniform deformation across all pair-wise distances due to the randomized nature of the FJLT is countered by performing an iterative procedure on the FJLT.  We found via experimental results that 20 iterations was suitable to obtain near-exact results to those in the original high-dimension, and this was used for all implementations of FJLT in our cross-validation experiments.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.4]{FJLT_deformation.jpg}\\
+\caption{FJLT Deformation}
+\label{fig:fjlt_deformation}
+\end{figure}
+
+The deformation of the pair-wise distances due to application of the FJLT from the original 256 dimension feature vectors to 20 dimension feature vectors.  The deformation is calculated by dividing the transformed pair-wise distances by the original pair-wise distances, and then dividing each by the mean of this distribution (the constant C, which is approximately $1/27$).  In this single instance of the FJLT, we find $82\%$ of all pairwise distances within a deformation of $1 \pm 0.2$;   $95\%$ within $1 \pm 0.3$;  and $99\%$ within $1 \pm 0.4$.   
+
 
 \subsection{Refined Graph Embedding}
+The Refined Graph Embedding relies on theoretical concepts covered in Spectral Graph theory. Let $G(V,E)$, with $|V| = n$ and $|E| = m $, be an undirected graph without self-loops. Let $A$ be the adjacency matrix defined as $A_{ij} = \i[(i,j) \in E]$ and $D$ be the degree-matrix of the graph $D = diag(d_1, d_2, \cdots d_n)$ with $d_i = \sum_{i=1}^n A_{ij}$. We further define the following matrices
+\begin{align}
+\begin{array}{cc}
+L = D-A & \text{combinatorial unnormalized graph Laplacian}\\
+P = D^{-1}A & \text{markov probability transition matrix}\\
+\mathcal{L} = I - D^{-1/2}*A*D^{1/2} & \text{normlaized graph laplacian}
+\end{array}
+\end{align}
+The largest eigenvalues and the corresponding eigenvectors of $\mathcal{L}$ are computed. Next, a stationary probability distribution is computed for the Markov Chain transition matrix $P$. The coordinates of the point in the reduced dimensional-space are obtained from the eigenvectors and the stationary-probability distribution computed. 
+The details of the implementation of the graph-embedding is covered in the lecture notes \cite{fmeyer} and the home-work assignment for the course, and hence shall not be explained in detail here. 
 
 \subsection{t-Distributed Stochastic Neighbour Embedding}
 The t-SNE algorithm \cite{tSNEdataViz}, was introduced earlier as a technique for visualization of high-dimensional datasets, to built a visual intuition of the data-distribution. From the fact that local neighbourhood information of the data is preserved by the technique, it would serve as a useful dimensional reduction technique, and hence used this method as an alternative to the Graph Embedding Technique.
@@ -199,12 +219,9 @@ The gradient of the Kullback-Liebler divergence between P and the t-Student base
 %_________________________________________________________________
 \section{Clustering and Statistical Learning}
 %_________________________________________________________________
-It is assumed that in the reduced dimension space, the euclidean metric shall serve as a sufficient metric to compare the different genres of songs. We intend to use the libraries available in Python Scikit-learn \cite{scikitlearn} to perform clustering of the reduced-space data.
 
-In particular we intend to investigate the DBSCAN clustering algorithm as its features appear suited to our genre classification problem.  In particular the notion of diagnosing the individual data points as "core" or "non-core" nodes belonging to the cluster can be used in conjunction with kNN for cluster membership detection by weighting neighbors differently for each case.  Also the diagnosis of nodes as outliers not belonging to any cluster may also be helpful in "weeding out" data points for which comparisons are not particularly useful.  Additionally, the fact that DBSCAN is agnostic to the shape characteristics of individual clusters is likely to be helpful.
+A k-nearest neighbor (k-NN) approach is adopted for the task of genre-classification once our data has been transformed into its final representation (after feature vector compilation and any dimension reduction).  Euclidean distances are computed between the query and all training data, and the k-nearest neighbors are returned with their distance and genre.  In the ‘raw’ voting case, each of these k neighbors is granted an equally weighted ‘vote’ of value 1.  Thus the genre with the largest total vote value is simply the genre which comprised the highest number of neighbors in the set of k neighbors.  We also institute the desired option of vote weighting, by which we apply a weighting function to each individual vote.  Each vote can be weighted on the distance of the neighbor, typically weighted by 1 / (1 + d) such that closer neighbors are given more ‘voting power’.  Additionally we allow the application of ‘genre weighting’ which applies a constant weight to the votes depending on the genre, in order to help to account for the disparity between sample sizes of the different genres.  It is inherently unfair, for example, that jazz has 26 total data points compared to 320 for classical.  We first experimented with each vote being weighted by (total data points / data points per genre) but this ultimately led to each jazz data point having a tenfold voting power over an equally close classical song.  Such a scheme ended with an extreme amount of false positives granted to the genres with fewest samples.  We therefore implemented some functions such that we capped the genre-to-genre weighting ratio to a maximum of 3-to-1, which gave better overall results.  
 
-%_________________________________________________________________
-Every query song whose genre needs to be determined, shall undergo the same process of dimension reduction, used to determine the clusters in the songs. The probability of belonging to each of the different clusters is determined by a process of voting by the nearest neighbors, or neighbors-of-neighbors. We shall not be evaluating the performance of the cluster-membership-probability of the different voting schemes individually, but its contribution to the whole genre-classification pipeline. 
 
 \subsection{Implementation}
 The embedding of data-points obtained by the Dimensional reduction techniques is expected to have the points arranged such that clusters can be detected by clustering algorithms. However, since we have the genres associated with each of the songs, we do not implement any unsupervised clustering algorithms. Given a query song, we identify the genre it belongs to by a voting-mechanism implemented by the neighbours of the query-point in the reduced dimensional space. This methodology shall be described in the section on Statistical Learning. 
@@ -215,9 +232,54 @@ We implement a k-nearest neighbors algorithm to detect a set of neighbors and th
 \section{Putting them together}
 %_________________________________________________________________
 
+\subsection{Experiment 1: Baseline}
+For our baseline algorithm, we represent each song as a 256 dimension feature vector representing the average spectral response of the entire song.  We first read in each .wav file and extract the first 20 MFCC coefficients for all frames (~23 ms) of the entire song.  We then compute the mean MFCC coefficients over all extracted frames, as well as the covariance matrix of these coefficients.  We then vectorize the covariance matrix and append all values together in a standardized vector structure (removing redundant entries of the symmetric covariance matrix).  The dimension is set to 256 so that we can utilize an implementation of FJLT to run the experiment in a lower dimensional space.  Here we use the standard Euclidean distance as our distance metric.  As a baseline, this experiment is able to obtain decent overall results ($65\%$ for all songs, $70\%$ for 3 genres), and presents a good comparison for our further algorithms.  
+
+
+
+\subsection{Experiment 2: "MFCC code-word histograms"}
 We expect the different genres are comprehensive, in the sense that all songs that do not get classified into either of the specialized genres get assigned to the category "World". Thus, it is possible that even white-noise could be classified as "World" music. Therefore, it is important to build a binary classifier that distinguishes between World and all the other families. We hope the method of Support Vector Machines can be used to discriminate between the "world" and "non-world" categories. 
 
 This is followed by a pipeline of algorithms that implement global dimension reduction, clustering algorithm, and statistical learning, to determine the probability of cluster membership of the query data. 
+
+\subsection{Experiment 3: “5-second song samples”}
+We also decided to explore the idea of representing songs as collections of shorter audio samples that occur in sequence.  Much like the codeword histogram technique, this method aims to exploit more information about each song (i.e. its dynamic nature) as opposed to simply summarizing it with a single feature vector.  The intuition behind this approach is that a human listener can tell a lot about a song (specifically the genre) fairly accurately when provided only a few seconds of the song’s music.  Generally, one need not listen to an entire song to assign that song to a genre.  Separating each song into shorter “song samples” changes the dynamic of the genre classification problem, ultimately leading to several advantages as well as a couple of disadvantages.
+(advantages)
+Vastly increases the number of total data points representing our song database from 729 to ~55,000.
+More connected sub-communities in high dimensional space
+Ability to determine and remove ‘outliers’
+Potentially better identify ‘hybrid genre’ songs
+Potentially identify a song’s genre (and song-wise similarity) accurately from only a portion of the original song.
+(disadvantages)
+Greatly increased sample size can hinder computation time via scalability problems
+Each song sample may describe less ‘unique’ information (i.e. redundancy in the data)
+
+Processing of the data is as follows.  Each song was first normalized such that the maximum volume (waveform amplitude) was normalized to a value of 1.  Then the MFCC coefficients were obtained using 23ms frames.  From the total frames we determine the number of song samples available in the song, using 500 consecutive frames (~ 5 seconds of audio) for each sample with a 250 frame overlap between consecutive song samples.  The song samples were prepared such that any unused additional frames were evenly divided between the very beginning and very end of the song (i.e. generally less than 5 seconds per song is then unused).
+A feature vector is produced for each song sample as summarized by the mean of their 20 MFCC coefficients along with a vectorized representation of their covariance matrix (just like our baseline experiment).  The values are placed into a vector of length (dimension) 256, with zeros in the unused dimensions, so that they are in a format ready to processed using a FJLT implementation if desired.  
+This methodology allows us to vastly increase the sample size of the entire audio space from our given data set from 729 individual songs, to approximately 55,000 total five-second song samples.  This explosion of total sample size does inherit the relative disparity in sample size between the genres, but allows some interesting possibilities in the way that we proceed with the analysis.
+
+Now that our sample size is so large, each individual data sample is not as precious and we can diagnose and remove outliers that could decrease the efficiency of our genre classification algorithm.  Our definition of ‘outlier’ in this context is an individual song sample which does not accurately describe its own genre.  To quantify this, we compare the pair-wise distances of each song sample with all other song samples of the same genre.  We then look at the distance to the fifth-nearest within-genre neighbor and use this as a metric from which to compare the ‘connectedness’ of the song samples.  This metric was chosen in order to discriminate between song samples near to only a few others of the same genre, and those near to a more significant number of samples from the same genre.  The $X\%$ of samples with the highest distance are removed as being ‘outliers’ as they are assumed to be the least representative of their genre.
+However, with the large increase in sample size, this pre-processing step can be inefficient with respect to computation time.  With a sample size of $N$, it requires $N^2$ computations to determine all pair-wise distances.  This may be alright for Jazz (2,198 total song samples), but not for Classical (20,235 total song samples).  Therefore we used an iterative technique, determining outliers for only 500 random song samples at a time for all groups of 500 samples per genre, then repeat the process four times.  Thus we reduce the number of operations from $N^2$ to $R \times N \times Z$ where R is the number of repetitions (we chose 4) and Z is the number of song samples for which analyze for outliers at a time (we chose 500).  Below is a table that shows the computational savings.  In order to obtain an end result of retaining $X\%$ of the total samples, we must actually retain a larger proportion at each iteration $X = \big(X^{\frac{1}{R}} \big)^R $.  With four iterations we must keep ~$95\%$ of the samples at each iteration to ultimately retain $80\%$ of all samples.  
+
+
+
+\begin{figure}[h!]
+\subfloat[]{\includegraphics[scale=0.37]{jazzOutlier2.jpg}}
+\subfloat[]{\includegraphics[scale=0.39]{jazzOutlier1.jpg}}
+\caption{(a)Original distribution for 5-th nearest neighbour  distance for all jazz song samples  (b) Retained distribution with outliers removed.}
+\label{fig:jazz_outlier_removal}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{comp_savings.jpg}
+\caption{Computational savings from iterative outlier removal.}
+\label{fig:compSavings}
+\end{figure}
+
+As this outlier removal step is considered pre-processing, we must only consider removing outliers from the training data and not the test data (query songs).  Therefore an outlier index variable is stored in order to account for this, and known outliers are used as normal data points for query songs as it is assumed that this outlier detection could not be done in a real-time application.
+
+Because each song is now represented as multiple data points, we have some flexibility in how to ultimately determine the genre for a query (test) song.  We could run our k-NN algorithm and assign each query song sample to a genre and then choose the genre for which the highest number of samples were assigned.  However, we chose to instead retain the k-NN votes for all samples and only compare their sum.  This approach retains the vote-weighting and effectively applies that to each individual sample. In this way, a song sample which is far from its nearest neighbors (i.e. is an ‘outlier’) is not given the same voting power as a song sample which is very near to its nearest neighbors.  Also, this can account for uneven voting for different parts of a song, and potential disparity among available votes per genre.  A song whose samples had significant Jazz votes but never a majority of Jazz votes in any individual sample would retain the influence of those Jazz neighbors, whereas assigning each sample to a genre would acquire no Jazz votes in the final song genre assignment phase.
 
 %_________________________________________________________________
 \section{Testing and Verifying the pipelines}
@@ -230,7 +292,17 @@ The feature vectors of concern is extracted for every song in the database. The 
 After computing the embedding of the songs in the reduced dimensional space, we adopt an iterative procedure of cross-validation of our classification scheme. At every iteration, the entire music database is randomly split into two segments - the training(~80\%) and testing dataset(~20\%), by generating proportional partitions within each genre.
 To be precise, for every genre, the set of all songs belong to it is partitioned into two subsets - training-set$(~80\%)$ and testing-set$(~20\%)$. The global-training-set(testing) is obtained by coalescing all the training-sets(testing) of each genre into one set. For each song, within the global-training-set, we determine its cluster-membership, by seeking out its neighbours from the global-training-set, and implementing a voting scheme. The results of the cluster-membership-assignment for the testing-set is compiled by creating a confusion-matrix. 
 
-The confusion-matrix is obtained by determining the percentage of songs of a given genre, that have been classified as belonging to each of the unique genre-types. This is possible, as the information regarding the true-categorization of the testing-data is known to us.   The mean and standard-deviation of the confusion-matrices obtained over all iterations, for a given genre-classification-pipeline, are computed and archived. The effectiveness of each pipeline is determined by comparing these statistics of the confusion matrices. 
+The confusion-matrix is obtained by determining the percentage of songs of a given genre, that have been classified as belonging to each of the unique genre-types. This is possible, as the information regarding the true-categorization of the testing-data is known to us.   The mean and standard-deviation of the confusion-matrices obtained over all iterations, for a given genre-classification-pipeline, are computed and archived. The effectiveness of each pipeline is determined by comparing these statistics of the confusion matrices. The results of the experiments are illustrated in the Appendix. 
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.4]{mfcc_itml_tsne_b01.jpg}\\
+\caption{Plot of the structure of dataset obtained by using a pipeline comprising of mfcc-code-word histogram features, itml and tsne.}
+\label{fig:mfccw_itml_tsne}
+\end{figure}
+
+
 
 %_________________________________________________________________
 \section{Discussion}
@@ -246,6 +318,12 @@ Though, we have described different alternatives for each stage of the data-proc
 
 
 \begin{thebibliography}{5}
+\bibitem{eliaspam}
+\textit{Elias Pampalk}Computational models of music similarity and their application in Music Information Retrieval; PhD Dessertation, TU-Wien, Faculty for Informatics, 2006.
+
+\bibitem{fjltAlgo}
+\textit{Ailon, Nir and Chazelle, Bernard.} Faster Dimension Reduction, Communication of the ACM, Vol. 53, No. 2, February 2010;  doi:10.1145/1646353.1646379
+
 \bibitem{infoTheoryMetricLearning}
 \textit{Jason V. Davis, Brian Kulis, Prateek Jain, Suvrit Sra and Inderjit S. Dhillon.} Information Theoretic Metric Learning, ICML June 2007, 209-216,  http://www.cs.utexas.edu/~pjain/itml/
 
@@ -261,6 +339,58 @@ Though, we have described different alternatives for each stage of the data-proc
 \textit{M. Hein, J.-Y. Audibert. }Intrinsic dimensionality estimation of submanifolds in Euclidean space,
 In L. de Raedt and S. Wrobel, editors, Proceedings of the 22nd International Conference on Machine Learning (ICML 2005), 289 - 296, ACM press, 2005, http://www.ml.uni-saarland.de/publications.htm
 
+\bibitem{fmeyer}
+\textit{Non-normalized Laplacian on Weighted Graphs} http://ecee.colorado.edu/~fmeyer/class/ecen5322/laplacian.pdf
 
 \end{thebibliography}
+
+\section{Appendix: Results of Experiments}
+\subsection{5-second song samples algorithm}
+
+An initial validation of this approach was run on two songs in the Jazz category, as it is one of the most problematic genres to accurately identify with our other algorithms.  Song 450 was a song that had three of its seven neighbors as other Jazz songs in the baseline experiment (Mean MFCCs plus covariance) and was correctly identified as Jazz in that experiment.  Song 447 on the other hand, had zero of its seven neighbors as other Jazz songs and thus was not correctly identified as Jazz in the baseline experiment.  Genre classification is shown in a pair of histograms for each song, one for ‘raw’ voting of the k-NN (k = 7) and one for ‘weighted’ voting of the k-NN.  Distance weighting of $1 / (1 + d)$ is used, and genre weighting of $1 / \sqrt(nGenreSamples)$ [this gives a maximum of 3-to-1 voting power between genres] are used in the ‘weighted’ cases.   We also show the votes per song sample for the ~50 samples for both test songs, in both ‘raw’ and ‘weighted’ voting cases.  The results show that genre-weighting is still an important consideration despite the increase in total sample size of the audio space - song 450 is classified as world using raw voting, whereas both songs are clearly assigned to jazz when ‘weighting’ is used.  We also see that there is a not a significant negative effect on genre-classification when assigning each sample to a genre.  Most interestingly, it can be seen from the per-sample voting of both songs that, in the weighted voting case at least, a random selection of say 3-5 consecutive song samples would more often than not correctly characterize these songs as jazz.  This means that this methodology has significant potential to use in an on-the-fly song comparison/classification application such as the song-identification mobile app Shazam.
+
+\begin{figure}[h!]
+\subfloat[S447 + raw-voting]{\includegraphics[scale=0.22]{BUNCH_test_song_447_raw.jpg}}
+\subfloat[S447 + weighted-votes]{\includegraphics[scale=0.22]{BUNCH_test_song_447.jpg}}\\
+\subfloat[S450 + raw-voting]{\includegraphics[scale=0.22]{BUNCH_test_song_450_raw.jpg}}
+\subfloat[S450 + weighted-votes]{\includegraphics[scale=0.22]{BUNCH_test_song_450.jpg}}
+\caption{Histogram bars show the sum of votes over all song samples per genre.  Lines show the votes when assigning each sample to a genre.}
+\label{fig:fivesecond_song_histogram}
+\end{figure}
+
+When running this 5-second song sample through the cross-validation, we encountered long computation times, though the algorithm was fairly quick (10 seconds) on a per-song basis.  Therefore we only present our results with one cross validation step.  Results are given for both distance weighting only, and distance plus genre weighting (our focus of discussion below).  Overall the algorithm achieves good results in the $72\%$ to $75\%$ range for all tested songs.  However this is distributed unevenly between genres.  However, an interesting result to note is that for the genres with poor results (Jazz and Rock/Pop), the genres with which they are ‘confused’ is highly compartmentalized compared to our other approaches.  Rock/Pop songs are correctly categorized only $39\%$ of the time, however it is confused with Metal/Punk $33\%$ of the time, together accounting for over $70\%$ of the total Rock/Pop songs (with Electronic this number jumps to over $85\%$).  A similar result holds for Jazz/Blues ($49\%$ correct), which is only confused with Electronic ($35\%$) and Classical ($15\%$).  This suggests that with further analysis and work we could identify some binary classifiers between these confused genres to improve our total accuracy.
+
+
+\begin{figure}[h!]
+\subfloat[S447 + raw-voting]{\includegraphics[scale=0.22]{BUNCH_test_song_447_perbunch_raw.jpg}}
+\subfloat[S447 + weighted-votes]{\includegraphics[scale=0.22]{BUNCH_test_song_447_perbunch.jpg}}\\
+\subfloat[S450 + raw-voting]{\includegraphics[scale=0.22]{BUNCH_test_song_450_perbunch_raw.jpg}}
+\subfloat[S450 + weighted-votes]{\includegraphics[scale=0.22]{BUNCH_test_song_450_perbunch.jpg}}
+\caption{Shows the votes per sample for each song, showing only the votes for the known genre and the two other genres getting the most votes for this song.}
+\label{fig:fivesecond_song_votes}
+\end{figure}
+
+\subsection{ Feature Representation: MFCC-Codeword-Histogram of Songs }
+
+
+The plots of the experiments using the mfcc-codeword-histogram give a visual representation of the distribution of the songs dataset in the 3 dimensional space. The clustering algorithm used a combination of k-NN and weighting of votes based on the total number of songs of the same genre in the database. Visually, we identify the pipeline comprising of the following:
+\begin{enumerate}
+\item Code-word Histograms of the MFCCs
+\item Information Theoretic metric learning in the high-dimensional space
+\item t-Distributed Stochastic Neighborhood Embedding
+\item k-NN Clustering with weighted votes
+\end{enumerate} 
+provided a reduced dimensional representation of the dataset that helped obtain a qualitative idea about the nature of the query songs, in addition to providing favourable classification accuracy. The confusion matrix and the probability of successful classification for the different genres is provided in the dataset attached. 
+The plots also highlight the importance of choosing a good metric-learning mechanism at the high-dimensional regime, to ensure that the dimensional reduction techniques used later, can benefit from the better approximation of the distance between the songs, in comparison to an arbitrary choice of euclidean distances. 
+
+\begin{figure}[h!]
+\subfloat[itml+tsne]{\includegraphics[scale=0.17]{mfcc_itml_tsne_b01.jpg}}
+\subfloat[tsne]{\includegraphics[scale=0.17]{mfccw_tsne.jpg}}\\
+\subfloat[itml+graph]{\includegraphics[scale=0.17]{mfccw_itml_graph.jpg}}
+\subfloat[graph]{\includegraphics[scale=0.17]{mfccw_graph.jpg}}
+\caption{Plot of the structure of dataset obtained by using the following pipeline: mfcc-code-word histogram features and (a)itml and tsne; (b) tsne alone; (c) imtl and graph embedding; (d) graph embedding alone.}
+\label{fig:mfccw_dataview}
+\end{figure}
+
+
 \end{document}

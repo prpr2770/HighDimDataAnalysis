@@ -7,7 +7,7 @@ Computation.
 
 [totalPoints, dimDataPoints] = size(Dataset);
 sigmaSqr = 4*pi^2;  % Gaussian RBF
-
+epsilon = 0;
 
 % Determine Distances between the points and the nearest neighbors
 mutualDistance = zeros(totalPoints,totalPoints);
@@ -42,8 +42,9 @@ toc
 % ===========================================================
 % Graph Theoretic Operations: Adjacency, Weight, Laplacian
 
-Adj_M = mutualSimilarity;  % DETERMINE A THRESHOLDING FOR THIS MATRIX ???
-deg_V = sum(Adj_M,2); %rowsum
+
+Adj_M = ones(size(mutualSimilarity)).*(mutualSimilarity > epsilon);  % DETERMINE A THRESHOLDING FOR THIS MATRIX ???
+deg_V = sum(Adj_M ,2); %rowsum
 Deg_M = diag(deg_V);
 
 warning('Laplacian')
