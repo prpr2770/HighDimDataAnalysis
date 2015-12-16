@@ -102,7 +102,7 @@ We note that the distance measures from different feature-vector representations
 
 
 %_________________________________________________________________
-\section{Distance in song-space}
+\section{Distance and Similarity in song-space}
 
 The choice of the Distance-Metric depends on the chosen Feature-Vector-representation for each song. The naive method to proceed would be to assume that all the songs are embedded in an Euclidean Space, and hence the distances can be computed using the L-2 Norm. 
 
@@ -134,7 +134,7 @@ min_A &  KL(p(x;A_0)||p(x;A))& \\
 The above optimization problem is solved as a log-determinant optimization problem. The details of the algorithm used and the implementation of the algorithm can be found in the original research paper referenced below \cite{infoTheoryMetricLearning}.
 
 %_________________________________________________________________
-\section{Similarity between songs in song-space}
+\subsection{Similarity between songs in song-space}
 Given a measure of distances between songs, as computed by the computed/assumed distance metrics, we also have information regarding the genre-id's of each song. We expect that songs of a same genres are more similar than songs of dissimilar genres. The similarities between songs can be quantitatively represented as a matrix containing values which are a function of the distances between the points. 
 
 When using only the distance information to describe similarity, we can choose the function to be any number of non-linear functions like:
@@ -223,10 +223,6 @@ The gradient of the Kullback-Liebler divergence between P and the t-Student base
 A k-nearest neighbor (k-NN) approach is adopted for the task of genre-classification once our data has been transformed into its final representation (after feature vector compilation and any dimension reduction).  Euclidean distances are computed between the query and all training data, and the k-nearest neighbors are returned with their distance and genre.  In the ‘raw’ voting case, each of these k neighbors is granted an equally weighted ‘vote’ of value 1.  Thus the genre with the largest total vote value is simply the genre which comprised the highest number of neighbors in the set of k neighbors.  We also institute the desired option of vote weighting, by which we apply a weighting function to each individual vote.  Each vote can be weighted on the distance of the neighbor, typically weighted by 1 / (1 + d) such that closer neighbors are given more ‘voting power’.  Additionally we allow the application of ‘genre weighting’ which applies a constant weight to the votes depending on the genre, in order to help to account for the disparity between sample sizes of the different genres.  It is inherently unfair, for example, that jazz has 26 total data points compared to 320 for classical.  We first experimented with each vote being weighted by (total data points / data points per genre) but this ultimately led to each jazz data point having a tenfold voting power over an equally close classical song.  Such a scheme ended with an extreme amount of false positives granted to the genres with fewest samples.  We therefore implemented some functions such that we capped the genre-to-genre weighting ratio to a maximum of 3-to-1, which gave better overall results.  
 
 
-\subsection{Implementation}
-The embedding of data-points obtained by the Dimensional reduction techniques is expected to have the points arranged such that clusters can be detected by clustering algorithms. However, since we have the genres associated with each of the songs, we do not implement any unsupervised clustering algorithms. Given a query song, we identify the genre it belongs to by a voting-mechanism implemented by the neighbours of the query-point in the reduced dimensional space. This methodology shall be described in the section on Statistical Learning. 
-
-We implement a k-nearest neighbors algorithm to detect a set of neighbors and their neighbors, for a given query-point embedded into a reduced-dimension projection space, containing a population of all songs in the database. The unique set of neighbours are identified, and a voting scheme is implemented. Each neighbor assosciates it own genre upon the query-song. 
 
 %_________________________________________________________________
 \section{Putting them together}
@@ -237,12 +233,12 @@ For our baseline algorithm, we represent each song as a 256 dimension feature ve
 
 
 
-\subsection{Experiment 2: "MFCC code-word histograms"}
+\subsection{Experiment 2: MFCC code-word histograms}
 We expect the different genres are comprehensive, in the sense that all songs that do not get classified into either of the specialized genres get assigned to the category "World". Thus, it is possible that even white-noise could be classified as "World" music. Therefore, it is important to build a binary classifier that distinguishes between World and all the other families. We hope the method of Support Vector Machines can be used to discriminate between the "world" and "non-world" categories. 
 
 This is followed by a pipeline of algorithms that implement global dimension reduction, clustering algorithm, and statistical learning, to determine the probability of cluster membership of the query data. 
 
-\subsection{Experiment 3: “5-second song samples”}
+\subsection{Experiment 3: 5-second song samples}
 We also decided to explore the idea of representing songs as collections of shorter audio samples that occur in sequence.  Much like the codeword histogram technique, this method aims to exploit more information about each song (i.e. its dynamic nature) as opposed to simply summarizing it with a single feature vector.  The intuition behind this approach is that a human listener can tell a lot about a song (specifically the genre) fairly accurately when provided only a few seconds of the song’s music.  Generally, one need not listen to an entire song to assign that song to a genre.  Separating each song into shorter “song samples” changes the dynamic of the genre classification problem, ultimately leading to several advantages as well as a couple of disadvantages.
 (advantages)
 Vastly increases the number of total data points representing our song database from 729 to ~55,000.
@@ -272,7 +268,7 @@ However, with the large increase in sample size, this pre-processing step can be
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.5]{comp_savings.jpg}
+\includegraphics[scale=0.7]{comp_savings.jpg}
 \caption{Computational savings from iterative outlier removal.}
 \label{fig:compSavings}
 \end{figure}
@@ -308,13 +304,20 @@ The confusion-matrix is obtained by determining the percentage of songs of a giv
 \section{Discussion}
 %_________________________________________________________________
 
-The dimensional-reduction stage of the algorithm pipeline, shall form the core component of the system. It is possible to generate myriad features from each song and thus embed the dataset into a very high dimensional space. However, the choice of the dimensional-reduction algorithm shall determine the extent of geometrical distortion, and loss of information, during the projection of points from the high-dimensional space to the reduced-dimensional space. 
+In this project we have implemented two novel pipelines geared towards handling the specific challenges related to the genre-classification problem over the given dataset:
+\begin{enumerate}
+\item The limited number of song samples from specific genres
+\item Identifying the metric for computing distances between the songs, in feature space. 
+\end{enumerate}
 
-Each dimension reduction algorithm may have a limitation on its efficacy in reducing the dimension of the data by a particular order. We can determine this only by experimentation, for each of the alternative pipelines. 
+The detailed statistical results of the experiments are provided in the appendix. However, we wish to summarize the outcome of the experiments below. The baseline experiment was implemented on the single gaussian model representation of each song(mfcc). The statistical results for this experiment was used to compare the performance of the novel pipelines that we designed. We also verified that using an iterative FJLT implementation to vastly reduce the dimension of the feature-space was effective in obtaining near-exact results to the performance in the original high-dimension. 
 
-As previously mentioned, the FJLT method reduces the dimension in relation to the distortion allowance.  In order to reduce to a workable dimension, excessive distortion allowance may be necessary which might lead to significant loss of information.
+In the experiment based on the mfcc-codeword-histogram, we identified that the implementation of a metric-algorithm to compute the distances between the songs in feature-space, is of paramount importance. This is seen by the poor performance of the algorithm, that relies on an Euclidean metric in measuring song-similarity. Using a combination of codeword histograms, itml and tSNE , we obtained an average success rate of $68\%$ for all songs, and more than $50\%$ accuracy for all genres except 'world'.
 
-Though, we have described different alternatives for each stage of the data-processing pipeline, it is important to identify which permutation of the combination of algorithm sequences shall provide the best performance. These algorithms might be evaluated in isolation, and also in cascaded combinations with one another. However, it is difficult to predict which combinations shall work better and why. The better pipeline can be determined only through experimentation and a comparison of the confusion matrices. 
+Concerning the experiment based on the '5s song samples', we observed significant improvement over the baseline, particularly in the 'Electronic' genre. This is achieved by utilizing the same feature vector representation of the data, with only splitting up the song into an array of fixed 5s intervals. The overall results are slightly better than the code-word histogram pipeline. However, it does not achieve the same genre-genre success rate. While this is true, the confusion matrix indicates that the confusion between the genre's is generally compartmentalized to one or two other genres, rather than being spread over the entire genre space. 
+
+Thus, we wish to present these two novel approaches  as suitable schemes for solving the genre-classification problem.
+
 
 
 \begin{thebibliography}{5}
@@ -370,7 +373,8 @@ When running this 5-second song sample through the cross-validation, we encounte
 \label{fig:fivesecond_song_votes}
 \end{figure}
 
-\subsection{ Feature Representation: MFCC-Codeword-Histogram of Songs }
+\pagebreak
+\subsection{MFCC-Codeword-Histogram of Songs }
 
 
 The plots of the experiments using the mfcc-codeword-histogram give a visual representation of the distribution of the songs dataset in the 3 dimensional space. The clustering algorithm used a combination of k-NN and weighting of votes based on the total number of songs of the same genre in the database. Visually, we identify the pipeline comprising of the following:
